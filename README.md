@@ -95,7 +95,7 @@ This plugin is licensed under the [GPLv2 or later](https://www.gnu.org/licenses/
 
 ## 👤 Author
 
-**advertsales**  
+**Ilyntiy**  
 📧 Support: [Telegram](https://t.me/advertsales)
 
 ---
