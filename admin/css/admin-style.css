@@ -1,0 +1,652 @@
+/* ===========================
+   General Styles
+   =========================== */
+
+.wpfpv-wrap {
+    margin: 0 20px 0 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, sans-serif;
+}
+
+/* ===========================
+   Page Header
+   =========================== */
+
+.wpfpv-header {
+    background: #fff;
+    border-left: 4px solid #2271b1;
+    padding: 30px 40px;
+    margin: 20px 0 30px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.wpfpv-title {
+    margin: 0 0 10px;
+    font-size: 28px;
+    font-weight: 600;
+    color: #1d2327;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.wpfpv-title .dashicons {
+    color: #2271b1;
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+}
+
+.wpfpv-subtitle {
+    margin: 0;
+    font-size: 14px;
+    color: #646970;
+    font-weight: 400;
+}
+
+/* ===========================
+   Statistics (Grid Cards)
+   =========================== */
+
+.wpfpv-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.wpfpv-stat-card {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.wpfpv-stat-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+}
+
+.wpfpv-stat-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.wpfpv-stat-icon .dashicons {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+    color: #fff;
+}
+
+.wpfpv-stat-icon-error {
+    background: linear-gradient(135deg, #d63638 0%, #b32d2e 100%);
+}
+
+.wpfpv-stat-icon-today {
+    background: linear-gradient(135deg, #2271b1 0%, #135e96 100%);
+}
+
+.wpfpv-stat-icon-users {
+    background: linear-gradient(135deg, #00a32a 0%, #007a1f 100%);
+}
+
+.wpfpv-stat-icon-storage {
+    background: linear-gradient(135deg, #646970 0%, #50575e 100%);
+}
+
+.wpfpv-stat-content {
+    flex: 1;
+}
+
+.wpfpv-stat-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: #1d2327;
+    line-height: 1;
+    margin-bottom: 6px;
+}
+
+.wpfpv-stat-label {
+    font-size: 13px;
+    color: #646970;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+/* ===========================
+   Cards
+   =========================== */
+
+.wpfpv-card {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.wpfpv-card-header {
+    padding: 20px 30px;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fafafa;
+}
+
+.wpfpv-card-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1d2327;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.wpfpv-card-title .dashicons {
+    color: #646970;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+}
+
+.wpfpv-card-body {
+    padding: 30px;
+}
+
+.wpfpv-card-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+/* ===========================
+   Buttons
+   =========================== */
+
+.wpfpv-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    line-height: 1;
+}
+
+.wpfpv-btn .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+.wpfpv-btn-primary {
+    background: #2271b1;
+    color: #fff;
+}
+
+.wpfpv-btn-primary:hover {
+    background: #135e96;
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(34, 113, 177, 0.3);
+}
+
+.wpfpv-btn-secondary {
+    background: #f0f0f0;
+    color: #50575e;
+}
+
+.wpfpv-btn-secondary:hover {
+    background: #dcdcdc;
+    color: #1d2327;
+}
+
+.wpfpv-btn-large {
+    padding: 14px 32px !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+}
+
+/* ===========================
+   Logs
+   =========================== */
+
+.wpfpv-logs-container {
+    max-height: 600px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.wpfpv-logs-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.wpfpv-logs-container::-webkit-scrollbar-track {
+    background: #f0f0f0;
+    border-radius: 4px;
+}
+
+.wpfpv-logs-container::-webkit-scrollbar-thumb {
+    background: #c0c0c0;
+    border-radius: 4px;
+}
+
+.wpfpv-logs-container::-webkit-scrollbar-thumb:hover {
+    background: #a0a0a0;
+}
+
+.wpfpv-log-entry {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    margin-bottom: 8px;
+    border-radius: 6px;
+    font-family: 'Monaco', 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    border-left: 3px solid;
+}
+
+.wpfpv-log-error {
+    background: #fff5f5;
+    border-color: #d63638;
+}
+
+.wpfpv-log-warning {
+    background: #fff8e5;
+    border-color: #dba617;
+}
+
+.wpfpv-log-success {
+    background: #f0f9f3;
+    border-color: #00a32a;
+}
+
+.wpfpv-log-icon {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin-top: 2px;
+}
+
+.wpfpv-log-error .wpfpv-log-icon {
+    color: #d63638;
+}
+
+.wpfpv-log-warning .wpfpv-log-icon {
+    color: #dba617;
+}
+
+.wpfpv-log-success .wpfpv-log-icon {
+    color: #00a32a;
+}
+
+.wpfpv-log-icon .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+.wpfpv-log-text {
+    flex: 1;
+    word-break: break-word;
+    color: #1d2327;
+}
+
+.wpfpv-log-notice {
+    padding: 20px;
+    margin-top: 20px;
+    background: #f0f6fc;
+    border: 1px solid #c5d9ed;
+    border-radius: 6px;
+    text-align: center;
+    color: #135e96;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.wpfpv-log-notice .dashicons {
+    color: #2271b1;
+}
+
+/* ===========================
+   Empty State
+   =========================== */
+
+.wpfpv-empty-state {
+    text-align: center;
+    padding: 80px 20px;
+}
+
+.wpfpv-empty-icon {
+    width: 80px;
+    height: 80px;
+    background: #f0f9f3;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.wpfpv-empty-icon .dashicons {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+    color: #00a32a;
+}
+
+.wpfpv-empty-state h3 {
+    margin: 0 0 10px;
+    font-size: 20px;
+    font-weight: 600;
+    color: #1d2327;
+}
+
+.wpfpv-empty-state p {
+    margin: 0;
+    font-size: 14px;
+    color: #646970;
+}
+
+/* ===========================
+   Info Panel
+   =========================== */
+
+.wpfpv-info-card {
+    background: linear-gradient(135deg, #f0f6fc 0%, #e6f2ff 100%);
+    border-color: #c5d9ed;
+}
+
+.wpfpv-info-card .wpfpv-card-header {
+    background: transparent;
+    border-bottom-color: #c5d9ed;
+}
+
+.wpfpv-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
+}
+
+.wpfpv-info-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(197, 217, 237, 0.5);
+    border-radius: 6px;
+    font-size: 14px;
+    color: #1d2327;
+    font-weight: 500;
+}
+
+.wpfpv-info-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: #2271b1;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.wpfpv-info-icon .dashicons {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+    color: #fff;
+}
+
+.wpfpv-info-item-path {
+    grid-column: 1 / -1;
+}
+
+.wpfpv-info-item code {
+    background: rgba(0, 0, 0, 0.05);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+/* ===========================
+   Settings Form
+   =========================== */
+
+.wpfpv-settings-form .form-table {
+    border: none;
+    margin: 0;
+}
+
+.wpfpv-settings-form .form-table th {
+    padding: 18px 0;
+    font-weight: 600;
+    color: #1d2327;
+    vertical-align: middle;
+    width: 280px;
+}
+
+.wpfpv-settings-form .form-table td {
+    padding: 18px 0;
+    vertical-align: middle;
+}
+
+.wpfpv-section-desc {
+    margin: 0 0 20px;
+    padding: 16px 20px;
+    background: #f0f6fc;
+    border-left: 3px solid #2271b1;
+    border-radius: 4px;
+    color: #135e96;
+    font-size: 14px;
+}
+
+h2.title {
+    margin: 30px 0 20px !important;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #e0e0e0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1d2327;
+}
+
+h2.title:first-of-type {
+    margin-top: 0 !important;
+}
+
+/* ===========================
+   Input Fields
+   =========================== */
+
+.wpfpv-input-number,
+.wpfpv-input-text {
+    padding: 10px 14px;
+    border: 1px solid #d0d0d0;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #1d2327;
+    transition: all 0.2s ease;
+    width: 100%;
+    max-width: 300px;
+}
+
+.wpfpv-input-number:focus,
+.wpfpv-input-text:focus {
+    border-color: #2271b1;
+    outline: none;
+    box-shadow: 0 0 0 1px #2271b1;
+}
+
+.wpfpv-textarea {
+    padding: 12px 14px;
+    border: 1px solid #d0d0d0;
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: 'Monaco', 'Courier New', monospace;
+    color: #1d2327;
+    transition: all 0.2s ease;
+    width: 100%;
+    max-width: 600px;
+    resize: vertical;
+}
+
+.wpfpv-textarea:focus {
+    border-color: #2271b1;
+    outline: none;
+    box-shadow: 0 0 0 1px #2271b1;
+}
+
+.description {
+    margin: 8px 0 0;
+    font-size: 13px;
+    color: #646970;
+    line-height: 1.5;
+}
+
+/* ===========================
+   Toggles
+   =========================== */
+
+.wpfpv-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+    margin: 0;
+}
+
+.wpfpv-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.wpfpv-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #d0d0d0;
+    transition: 0.3s;
+    border-radius: 26px;
+}
+
+.wpfpv-slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.wpfpv-switch input:checked + .wpfpv-slider {
+    background-color: #2271b1;
+}
+
+.wpfpv-switch input:checked + .wpfpv-slider:before {
+    transform: translateX(24px);
+}
+
+.wpfpv-switch-label {
+    margin-left: 12px;
+    vertical-align: middle;
+    font-size: 14px;
+    color: #1d2327;
+}
+
+/* ===========================
+   Form Footer
+   =========================== */
+
+.wpfpv-form-footer {
+    margin-top: 30px;
+    padding: 24px 30px;
+    background: #fafafa;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    text-align: center;
+}
+
+/* ===========================
+   Responsive
+   =========================== */
+
+@media screen and (max-width: 782px) {
+    .wpfpv-wrap {
+        margin-right: 0;
+    }
+    
+    .wpfpv-header {
+        padding: 20px 24px;
+    }
+    
+    .wpfpv-title {
+        font-size: 22px;
+    }
+    
+    .wpfpv-stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .wpfpv-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .wpfpv-card-actions {
+        width: 100%;
+        flex-direction: column;
+    }
+    
+    .wpfpv-card-actions .wpfpv-btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .wpfpv-info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .wpfpv-settings-form .form-table th,
+    .wpfpv-settings-form .form-table td {
+        display: block;
+        width: 100%;
+        padding: 12px 0;
+    }
+}
