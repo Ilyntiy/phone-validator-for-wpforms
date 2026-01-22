@@ -83,13 +83,12 @@ class WPFPV_Validator {
      */
     private function is_blacklisted($phone_digits, $blacklist) {
         $blocked_numbers = array_filter(array_map('trim', explode("\n", $blacklist)));
-        
         foreach ($blocked_numbers as $blocked) {
-            if (strpos($phone_digits, $blocked) !== false) {
+            // Exact match only
+            if ($phone_digits === $blocked) {
                 return true;
             }
         }
-        
         return false;
     }
     
@@ -99,12 +98,19 @@ class WPFPV_Validator {
     private function has_valid_country_code($field_submit, $allowed_codes) {
         $codes = array_map('trim', explode(',', $allowed_codes));
         
+        // Normalize: remove all non-digits except leading +
+        $normalized = preg_replace('/[^\d+]/', '', $field_submit);
+        
         foreach ($codes as $code) {
-            if (strpos($field_submit, $code) === 0) {
+            // Check both with + and without
+            $code_clean = ltrim($code, '+');
+            
+            // Match +7xxx or 7xxx
+            if (strpos($normalized, '+' . $code_clean) === 0 || 
+                strpos($normalized, $code_clean) === 0) {
                 return true;
             }
         }
-        
         return false;
     }
 }

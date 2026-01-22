@@ -94,20 +94,37 @@ class WPFPV_Logger {
      * Write to file
      */
     private static function write_to_file($log_entry) {
-        file_put_contents(WPFPV_LOG_FILE, $log_entry, FILE_APPEND | LOCK_EX);
+        // Ensure directory exists and is writable
+        if (!file_exists(WPFPV_LOG_DIR) || !is_writable(WPFPV_LOG_DIR)) {
+            return false;
+        }
+        
+        // Write log entry
+        $result = @file_put_contents(WPFPV_LOG_FILE, $log_entry, FILE_APPEND | LOCK_EX);
+        
+        return $result !== false;
     }
     
     /**
      * Get IP address
      */
     private static function get_user_ip() {
-        if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
-            return sanitize_text_field($_SERVER['HTTP_CLIENT_IP']);
-        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            return sanitize_text_field($_SERVER['HTTP_X_FORWARDED_FOR']);
-        } else {
-            return sanitize_text_field($_SERVER['REMOTE_ADDR']);
+        // Use REMOTE_ADDR as primary (most reliable)
+        $ip = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '';
+        
+        // Only trust X-Forwarded-For if behind a known proxy (e.g., Cloudflare, load balancer)
+        // and REMOTE_ADDR is a trusted proxy IP
+        if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $forwarded_ips = array_map('trim', explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']));
+            // Use first IP in chain (original client IP)
+            if (!empty($forwarded_ips[0]) && filter_var($forwarded_ips[0], FILTER_VALIDATE_IP)) {
+                // Only use if you're behind a trusted proxy (optional check)
+                // For basic security, prefer REMOTE_ADDR
+                // $ip = $forwarded_ips[0];
+            }
         }
+        
+        return sanitize_text_field($ip);
     }
     
     /**
@@ -198,6 +215,8 @@ class WPFPV_Logger {
             }
         }
         
-        file_put_contents(WPFPV_LOG_FILE, implode("\n", $new_logs));
+        if (is_writable(WPFPV_LOG_FILE)) {
+            file_put_contents(WPFPV_LOG_FILE, implode("\n", $new_logs));
+        }
     }
 }

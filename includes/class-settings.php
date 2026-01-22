@@ -94,21 +94,21 @@ class WPFPV_Settings {
      * Section: General Rules
      */
     public function section_main() {
-        echo '<p class="wpfpv-section-desc">' . __('Basic phone number validation parameters', 'phone-validator-for-wpforms') . '</p>';
+        echo '<p class="wpfpv-section-desc">' . esc_html__('Basic phone number validation parameters', 'phone-validator-for-wpforms') . '</p>';
     }
     
     /**
      * Section: Advanced Checks
      */
     public function section_advanced() {
-        echo '<p class="wpfpv-section-desc">' . __('Protection against spam and fake numbers', 'phone-validator-for-wpforms') . '</p>';
+        echo '<p class="wpfpv-section-desc">' . esc_html__('Protection against spam and fake numbers', 'phone-validator-for-wpforms') . '</p>';
     }
     
     /**
      * Section: Security System
      */
     public function section_system() {
-        echo '<p class="wpfpv-section-desc">' . __('Settings for repeat submission protection and logging', 'phone-validator-for-wpforms') . '</p>';
+        echo '<p class="wpfpv-section-desc">' . esc_html__('Settings for repeat submission protection and logging', 'phone-validator-for-wpforms') . '</p>';
     }
     
     /**
@@ -118,7 +118,7 @@ class WPFPV_Settings {
         $settings = self::get();
         ?>
         <input type="number" name="wpfpv_settings[min_length]" value="<?php echo esc_attr($settings['min_length']); ?>" min="1" max="20" class="wpfpv-input-number">
-        <p class="description"><?php _e('Minimum number of digits (recommended 6-10)', 'phone-validator-for-wpforms'); ?></p>
+        <p class="description"><?php esc_html_e('Minimum number of digits (recommended 6-10)', 'phone-validator-for-wpforms'); ?></p>
         <?php
     }
     
@@ -129,7 +129,7 @@ class WPFPV_Settings {
         $settings = self::get();
         ?>
         <input type="number" name="wpfpv_settings[max_length]" value="<?php echo esc_attr($settings['max_length']); ?>" min="5" max="20" class="wpfpv-input-number">
-        <p class="description"><?php _e('Maximum number of digits (recommended 11-15)', 'phone-validator-for-wpforms'); ?></p>
+        <p class="description"><?php esc_html_e('Maximum number of digits (recommended 11-15)', 'phone-validator-for-wpforms'); ?></p>
         <?php
     }
     
@@ -140,7 +140,7 @@ class WPFPV_Settings {
         $settings = self::get();
         ?>
         <input type="number" name="wpfpv_settings[max_repeats]" value="<?php echo esc_attr($settings['max_repeats']); ?>" min="2" max="10" class="wpfpv-input-number">
-        <p class="description"><?php _e('Blocks entries with too many identical consecutive digits', 'phone-validator-for-wpforms'); ?></p>
+        <p class="description"><?php esc_html_e('Blocks entries with too many identical consecutive digits', 'phone-validator-for-wpforms'); ?></p>
         <?php
     }
        
@@ -151,7 +151,7 @@ class WPFPV_Settings {
         $settings = self::get();
         ?>
         <textarea name="wpfpv_settings[blacklist]" rows="6" class="wpfpv-textarea"><?php echo esc_textarea($settings['blacklist']); ?></textarea>
-        <p class="description"><?php _e('One number per line (digits only)', 'phone-validator-for-wpforms'); ?></p>
+        <p class="description"><?php esc_html_e('One number per line (digits only)', 'phone-validator-for-wpforms'); ?></p>
         <?php
     }
     
@@ -162,7 +162,7 @@ class WPFPV_Settings {
         $settings = self::get();
         ?>
         <input type="text" name="wpfpv_settings[allowed_country_codes]" value="<?php echo esc_attr($settings['allowed_country_codes']); ?>" class="wpfpv-input-text" placeholder="+7, +380, +375">
-        <p class="description"><?php _e('Comma separated. Empty = all codes allowed', 'phone-validator-for-wpforms'); ?></p>
+        <p class="description"><?php esc_html_e('Comma separated. Empty = all codes allowed', 'phone-validator-for-wpforms'); ?></p>
         <?php
     }
     
@@ -173,7 +173,7 @@ class WPFPV_Settings {
         $settings = self::get();
         ?>
         <input type="number" name="wpfpv_settings[throttle_time]" value="<?php echo esc_attr($settings['throttle_time']); ?>" min="0" max="60" class="wpfpv-input-number">
-        <p class="description"><?php _e('Minimum interval between successful submissions (0 = disabled)', 'phone-validator-for-wpforms'); ?></p>
+        <p class="description"><?php esc_html_e('Minimum interval between successful submissions (0 = disabled)', 'phone-validator-for-wpforms'); ?></p>
         <?php
     }
     
@@ -187,7 +187,7 @@ class WPFPV_Settings {
             <input type="checkbox" name="wpfpv_settings[enable_logging]" value="1" <?php checked(1, $settings['enable_logging']); ?>>
             <span class="wpfpv-slider"></span>
         </label>
-        <span class="wpfpv-switch-label"><?php _e('Log validation errors', 'phone-validator-for-wpforms'); ?></span>
+        <span class="wpfpv-switch-label"><?php esc_html_e('Log validation errors', 'phone-validator-for-wpforms'); ?></span>
         <?php
     }
     
@@ -198,7 +198,7 @@ class WPFPV_Settings {
         $settings = self::get();
         ?>
         <input type="number" name="wpfpv_settings[auto_clean_logs]" value="<?php echo esc_attr($settings['auto_clean_logs']); ?>" min="0" max="365" class="wpfpv-input-number">
-        <p class="description"><?php _e('Delete logs older than specified number of days (0 = disabled)', 'phone-validator-for-wpforms'); ?></p>
+        <p class="description"><?php esc_html_e('Delete logs older than specified number of days (0 = disabled)', 'phone-validator-for-wpforms'); ?></p>
         <?php
     }
     

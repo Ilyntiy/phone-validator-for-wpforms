@@ -7,10 +7,6 @@
     
     $(document).ready(function() {
         
-        // Auto-update statistics (optional)
-        function updateStats() {            
-        }
-        
         // Confirm log clearing
         $('.wpfpv-btn-secondary[name="wpfpv_clear_logs"]').on('click', function(e) {
             if (!confirm(wpfpvAdmin.clearConfirm || 'Вы уверены?')) {

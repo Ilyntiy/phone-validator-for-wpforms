@@ -102,7 +102,7 @@ class WPFPV_Admin {
     }
     
     /**
-     * Страница настроек
+     * Settings page
      */
     public function render_settings_page() {
         if (!current_user_can('manage_options')) {

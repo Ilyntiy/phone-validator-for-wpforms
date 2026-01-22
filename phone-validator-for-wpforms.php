@@ -1,15 +1,18 @@
 <?php
 /**
- * Plugin Name:       Phone Validator for WPForms
- * Description:       Advanced phone number validation, country code checks, and anti-spam protection for WPForms fields.
- * Version:           1.0.0
- * Author:            Ilyntiy
- * Text Domain:       phone-validator-for-wpforms
- * Domain Path:       /languages
- * License:           GPLv2 or later
- * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
+ * Plugin Name: Phone Validator for WPForms
+ * Plugin URI: https://github.com/Ilyntiy/phone-validator-for-wpforms
+ * Description: Advanced phone validation for WPForms.
+ * Version: 1.0.0
+ * Author: Ilyntiy
+ * Author URI: https://profiles.wordpress.org/gogicher/
+ * License: GPL v2 or later
+ * Text Domain: phone-validator-for-wpforms
  * Requires at least: 5.6
- * Requires PHP:      7.4
+ * Tested up to: 6.9
+ * Requires PHP: 7.4
+ * WC requires at least: 0
+ * WC tested up to: 0
  */
 
 if (!defined('ABSPATH')) {
@@ -21,7 +24,11 @@ define('WPFPV_VERSION', '1.0.0');
 define('WPFPV_PLUGIN_FILE', __FILE__);
 define('WPFPV_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('WPFPV_PLUGIN_URL', plugin_dir_url(__FILE__));
-define('WPFPV_LOG_FILE', WP_CONTENT_DIR . '/wpforms-phone-validation.log');
+
+// Determine log directory path
+$upload_dir = wp_upload_dir();
+define('WPFPV_LOG_DIR', $upload_dir['basedir'] . '/phone-validator-for-wpforms');
+define('WPFPV_LOG_FILE', WPFPV_LOG_DIR . '/validation.log');
 
 // Class Autoloader
 spl_autoload_register(function ($class) {
@@ -46,7 +53,6 @@ require_once WPFPV_PLUGIN_DIR . 'admin/class-admin.php';
 
 // Plugin Initialization
 function wpfpv_init() {
-    load_plugin_textdomain('phone-validator-for-wpforms', false, dirname(plugin_basename(__FILE__)) . '/languages');
     WPFPV_Core::instance();
 }
 add_action('plugins_loaded', 'wpfpv_init');

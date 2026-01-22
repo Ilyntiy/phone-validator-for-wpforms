@@ -15,9 +15,9 @@ if (!defined('ABSPATH')) {
         <div class="wpfpv-header-content">
             <h1 class="wpfpv-title">
                 <span class="dashicons dashicons-admin-settings"></span>
-                <?php _e('Phone Validator for WPForms', 'phone-validator-for-wpforms'); ?>
+                <?php esc_html_e('Phone Validator for WPForms', 'phone-validator-for-wpforms'); ?>
             </h1>
-            <p class="wpfpv-subtitle"><?php _e('Configure phone number validation rules', 'phone-validator-for-wpforms'); ?></p>
+            <p class="wpfpv-subtitle"><?php esc_html_e('Configure phone number validation rules', 'phone-validator-for-wpforms'); ?></p>
         </div>
     </div>
     
@@ -34,7 +34,7 @@ if (!defined('ABSPATH')) {
                 <div class="wpfpv-card-header">
                     <h2 class="wpfpv-card-title">
                         <span class="dashicons dashicons-admin-generic"></span>
-                        <?php _e('General Rules', 'phone-validator-for-wpforms'); ?>
+                        <?php esc_html_e('General Rules', 'phone-validator-for-wpforms'); ?>
                     </h2>
                 </div>
                 <div class="wpfpv-card-body">
