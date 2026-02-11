@@ -175,7 +175,7 @@ class WPFPV_Logger {
                 $today_all++;
             }
             
-            if (preg_match('/IP:\s*([\d\.:]+)/', $entry, $matches)) {
+            if (preg_match('/IP:\s*([^\s|]+)/', $entry, $matches)) {
                 $unique_ips[$matches[1]] = true;
             }
         }
@@ -216,7 +216,11 @@ class WPFPV_Logger {
         }
         
         if (is_writable(WPFPV_LOG_FILE)) {
-            file_put_contents(WPFPV_LOG_FILE, implode("\n", $new_logs));
+            if (!empty($new_logs)) {
+                file_put_contents(WPFPV_LOG_FILE, implode("\n", $new_logs) . "\n");
+            } else {
+                file_put_contents(WPFPV_LOG_FILE, '');
+            }
         }
     }
 }

@@ -73,6 +73,10 @@ No, validation runs only when a form is submitted. Logs are stored in a file (no
 
 ## 📝 Changelog
 
+### 1.0.1
+- Fixed: Correct IPv6 address counting in logging system
+- Improved: IP address detection now properly handles both IPv4 and IPv6 formats
+
 ### 1.0.0
 - Initial public release
 - Includes advanced validation, spam protection, and logging features

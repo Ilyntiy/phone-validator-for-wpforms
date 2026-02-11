@@ -3,7 +3,7 @@
  * Plugin Name: Phone Validator for WPForms
  * Plugin URI: https://github.com/Ilyntiy/phone-validator-for-wpforms
  * Description: Advanced phone validation for WPForms.
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: Ilyntiy
  * Author URI: https://profiles.wordpress.org/gogicher/
  * License: GPL v2 or later
