@@ -1,188 +1,152 @@
 <?php
 /**
- * Logs Page Template
+ * History screen.
+ *
+ * @package PhoneValidatorForWPForms
  */
 
-if (!defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
-$stats = WPFPV_Logger::get_stats();
-$logs = WPFPV_Logger::get_logs();
-$settings = WPFPV_Settings::get();
-$display_logs = array_slice(array_reverse($logs), 0, 100);
-?>
+// Filters and paging are read-only view options, no state is changed.
+// phpcs:disable WordPress.Security.NonceVerification.Recommended
+$wpfpv_type   = isset( $_GET['type'] ) ? strtoupper( sanitize_key( wp_unslash( $_GET['type'] ) ) ) : '';
+$wpfpv_page   = isset( $_GET['paged'] ) ? max( 1, absint( $_GET['paged'] ) ) : 1;
+$wpfpv_notice = isset( $_GET['wpfpv_notice'] ) ? WPFPV_Admin::notice_message( sanitize_key( wp_unslash( $_GET['wpfpv_notice'] ) ) ) : null;
+// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
-<div class="wpfpv-wrap">
-    
-    <!-- Page Header -->
-    <div class="wpfpv-header">
-        <div class="wpfpv-header-content">
-            <h1 class="wpfpv-title">
-                <span class="dashicons dashicons-phone"></span>
-                <?php esc_html_e('Phone Validation History', 'phone-validator-for-wpforms'); ?>
-            </h1>
-            <p class="wpfpv-subtitle"><?php esc_html_e('View and analyze form validation errors', 'phone-validator-for-wpforms'); ?></p>
-        </div>
-    </div>
-    
-    <!-- FINAL STATISTICS -->
-    <div class="wpfpv-stats-grid">
-        <!-- 1. Total validation errors -->
-        <div class="wpfpv-stat-card">
-            <div class="wpfpv-stat-icon wpfpv-stat-icon-error">
-                <span class="dashicons dashicons-warning"></span>
-            </div>
-            <div class="wpfpv-stat-content">
-                <div class="wpfpv-stat-value"><?php echo esc_html(number_format($stats['total_errors'])); ?></div>
-                <div class="wpfpv-stat-label"><?php esc_html_e('Total Errors', 'phone-validator-for-wpforms'); ?></div>
-            </div>
-        </div>
-        
-        <!-- 2. Total log entries -->
-        <div class="wpfpv-stat-card">
-            <div class="wpfpv-stat-icon wpfpv-stat-icon-today">
-                <span class="dashicons dashicons-list-view"></span>
-            </div>
-            <div class="wpfpv-stat-content">
-                <div class="wpfpv-stat-value"><?php echo esc_html(number_format($stats['total'])); ?></div>
-                <div class="wpfpv-stat-label"><?php esc_html_e('Total Entries', 'phone-validator-for-wpforms'); ?></div>
-            </div>
-        </div>
-        
-        <!-- 3. Unique IPs -->
-        <div class="wpfpv-stat-card">
-            <div class="wpfpv-stat-icon wpfpv-stat-icon-users">
-                <span class="dashicons dashicons-admin-users"></span>
-            </div>
-            <div class="wpfpv-stat-content">
-                <div class="wpfpv-stat-value"><?php echo esc_html(number_format($stats['unique_ips'])); ?></div>
-                <div class="wpfpv-stat-label"><?php esc_html_e('Unique IPs', 'phone-validator-for-wpforms'); ?></div>
-            </div>
-        </div>
-        
-        <!-- 4. Logs size -->
-        <div class="wpfpv-stat-card">
-            <div class="wpfpv-stat-icon wpfpv-stat-icon-storage">
-                <span class="dashicons dashicons-database"></span>
-            </div>
-            <div class="wpfpv-stat-content">
-                <div class="wpfpv-stat-value"><?php echo esc_html($stats['file_size']); ?></div>
-                <div class="wpfpv-stat-label"><?php esc_html_e('Log Size', 'phone-validator-for-wpforms'); ?></div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Logs Journal -->
-    <div class="wpfpv-card">
-        <div class="wpfpv-card-header">
-            <h2 class="wpfpv-card-title">
-                <span class="dashicons dashicons-list-view"></span>
-                <?php esc_html_e('Validation Error Log', 'phone-validator-for-wpforms'); ?>
-            </h2>
-            <div class="wpfpv-card-actions">
-                <?php if ($stats['total'] > 0): ?>
-                    <form method="post" style="display: inline;">
-                        <?php wp_nonce_field('wpfpv_clear_logs'); ?>
-                        <button type="submit" 
-                                name="wpfpv_clear_logs" 
-                                class="wpfpv-btn wpfpv-btn-secondary"
-                                onclick="return confirm('<?php esc_attr_e('Are you sure you want to clear all logs?', 'phone-validator-for-wpforms'); ?>');">
-                            <span class="dashicons dashicons-trash"></span>
-                            <?php esc_html_e('Clear Logs', 'phone-validator-for-wpforms'); ?>
-                        </button>
-                    </form>
-                    <a href="<?php echo esc_url(WPFPV_LOG_FILE); ?>" 
-                       class="wpfpv-btn wpfpv-btn-primary" 
-                       download="wpforms-phone-validation.log">
-                        <span class="dashicons dashicons-download"></span>
-                        <?php esc_html_e('Download Logs', 'phone-validator-for-wpforms'); ?>
-                    </a>
-                <?php endif; ?>
-            </div>
-        </div>
-        
-        <div class="wpfpv-card-body">
-            <?php if ($stats['total'] > 0): ?>
-                <div class="wpfpv-logs-container">
-                    <?php foreach ($display_logs as $entry): 
-                        if (trim($entry)):
-                            $entry_type = 'error';
-                            if (strpos($entry, 'SUCCESS') !== false) {
-                                $entry_type = 'success';
-                            } elseif (strpos($entry, 'THROTTLE') !== false) {
-                                $entry_type = 'warning';
-                            }
-                    ?>
-                        <div class="wpfpv-log-entry wpfpv-log-<?php echo esc_html($entry_type); ?>">
-                            <span class="wpfpv-log-icon">
-                                <?php if ($entry_type === 'success'): ?>
-                                    <span class="dashicons dashicons-yes-alt"></span>
-                                <?php elseif ($entry_type === 'warning'): ?>
-                                    <span class="dashicons dashicons-clock"></span>
-                                <?php else: ?>
-                                    <span class="dashicons dashicons-warning"></span>
-                                <?php endif; ?>
-                            </span>
-                            <span class="wpfpv-log-text"><?php echo esc_html($entry); ?></span>
-                        </div>
-                    <?php endif; endforeach; ?>
-                    
-                    <?php if ($stats['total'] > 100): ?>
-                        <div class="wpfpv-log-notice">
-                            <span class="dashicons dashicons-info"></span>
-                            <?php printf(esc_html__('Showing last 100 of %s entries.', 'phone-validator-for-wpforms'), esc_html(number_format($stats['total']))); ?>
-                        </div>
-                    <?php endif; ?>
-                </div>
-            <?php else: ?>
-                <div class="wpfpv-empty-state">
-                    <div class="wpfpv-empty-icon">
-                        <span class="dashicons dashicons-yes-alt"></span>
-                    </div>
-                    <h3><?php esc_html_e('Logs are empty', 'phone-validator-for-wpforms'); ?></h3>
-                    <p><?php esc_html_e('Submit a test form with an invalid number to check.', 'phone-validator-for-wpforms'); ?></p>
-                </div>
-            <?php endif; ?>
-        </div>
-    </div>
-    
-    <!-- Info Panel -->
-    <div class="wpfpv-card wpfpv-info-card">
-        <div class="wpfpv-card-header">
-            <h2 class="wpfpv-card-title">
-                <span class="dashicons dashicons-info-outline"></span>
-                <?php esc_html_e('Active Validation Rules', 'phone-validator-for-wpforms'); ?>
-            </h2>
-        </div>
-        <div class="wpfpv-card-body">
-            <div class="wpfpv-info-grid">
-                <div class="wpfpv-info-item">
-                    <span class="wpfpv-info-icon"><span class="dashicons dashicons-yes"></span></span>
-                    <?php printf(esc_html__('Min length: %d digits', 'phone-validator-for-wpforms'), esc_html($settings['min_length'])); ?>
-                </div>
-                <div class="wpfpv-info-item">
-                    <span class="wpfpv-info-icon"><span class="dashicons dashicons-yes"></span></span>
-                    <?php printf(esc_html__('Max length: %d digits', 'phone-validator-for-wpforms'), esc_html($settings['max_length'])); ?>
-                </div>
-                <?php if ($settings['max_repeats'] > 0): ?>
-                <div class="wpfpv-info-item">
-                    <span class="wpfpv-info-icon"><span class="dashicons dashicons-yes"></span></span>
-                    <?php printf(esc_html__('Max repeats: %d', 'phone-validator-for-wpforms'), esc_html($settings['max_repeats'])); ?>
-                </div>
-                <?php endif; ?>
-                <?php if ($settings['throttle_time'] > 0): ?>
-                <div class="wpfpv-info-item">
-                    <span class="wpfpv-info-icon"><span class="dashicons dashicons-yes"></span></span>
-                    <?php printf(esc_html__('Throttling: %d min', 'phone-validator-for-wpforms'), esc_html($settings['throttle_time'])); ?>
-                </div>
-                <?php endif; ?>
-                <div class="wpfpv-info-item wpfpv-info-item-path">
-                    <span class="wpfpv-info-icon"><span class="dashicons dashicons-media-code"></span></span>
-                    <code><?php echo esc_html(WPFPV_LOG_FILE); ?></code>
-                </div>
-            </div>
-        </div>
-    </div>
-    
+$wpfpv_types   = WPFPV_Logger::types();
+$wpfpv_type    = in_array( $wpfpv_type, $wpfpv_types, true ) ? $wpfpv_type : '';
+$wpfpv_all     = WPFPV_Logger::get_entries();
+$wpfpv_stats   = WPFPV_Logger::get_stats( $wpfpv_all );
+$wpfpv_entries = $wpfpv_all;
+
+if ( '' !== $wpfpv_type ) {
+	$wpfpv_entries = array_values(
+		array_filter(
+			$wpfpv_all,
+			static function ( $entry ) use ( $wpfpv_type ) {
+				return $entry['type'] === $wpfpv_type;
+			}
+		)
+	);
+}
+
+$wpfpv_total = count( $wpfpv_entries );
+$wpfpv_pages = max( 1, (int) ceil( $wpfpv_total / WPFPV_Admin::PER_PAGE ) );
+$wpfpv_page  = min( $wpfpv_page, $wpfpv_pages );
+$wpfpv_rows  = array_slice( $wpfpv_entries, ( $wpfpv_page - 1 ) * WPFPV_Admin::PER_PAGE, WPFPV_Admin::PER_PAGE );
+$wpfpv_base  = admin_url( 'admin.php?page=' . WPFPV_Admin::SLUG_LOGS );
+
+$wpfpv_labels = array(
+	'VALIDATION' => __( 'Invalid number', 'phone-validator-for-wpforms' ),
+	'THROTTLE'   => __( 'Too frequent', 'phone-validator-for-wpforms' ),
+	'LIMIT'      => __( 'Daily limit', 'phone-validator-for-wpforms' ),
+	'HONEYPOT'   => __( 'Bot (honeypot)', 'phone-validator-for-wpforms' ),
+	'SUCCESS'    => __( 'Accepted', 'phone-validator-for-wpforms' ),
+	'OTHER'      => __( 'Other', 'phone-validator-for-wpforms' ),
+);
+?>
+<div class="wrap wpfpv-wrap">
+	<h1 class="wp-heading-inline screen-reader-text"><?php esc_html_e( 'Submission history', 'phone-validator-for-wpforms' ); ?></h1>
+	<hr class="wp-header-end">
+
+	<header class="wpfpv-hero">
+		<img class="wpfpv-hero__bear" src="<?php echo esc_url( WPFPV_PLUGIN_URL . 'admin/images/bear.png' ); ?>" width="150" alt="">
+		<div>
+			<h2 class="wpfpv-hero__title"><?php esc_html_e( 'Submission history', 'phone-validator-for-wpforms' ); ?></h2>
+			<p class="wpfpv-hero__text"><?php esc_html_e( 'What the plugin rejected and accepted, newest first.', 'phone-validator-for-wpforms' ); ?></p>
+		</div>
+	</header>
+
+	<?php if ( $wpfpv_notice ) : ?>
+		<div class="notice notice-<?php echo esc_attr( $wpfpv_notice['type'] ); ?> is-dismissible"><p><?php echo esc_html( $wpfpv_notice['text'] ); ?></p></div>
+	<?php endif; ?>
+
+	<ul class="wpfpv-stats">
+		<li><strong><?php echo esc_html( number_format_i18n( $wpfpv_stats['total'] ) ); ?></strong><span><?php esc_html_e( 'Entries', 'phone-validator-for-wpforms' ); ?></span></li>
+		<li><strong><?php echo esc_html( number_format_i18n( $wpfpv_stats['blocked'] ) ); ?></strong><span><?php esc_html_e( 'Rejected', 'phone-validator-for-wpforms' ); ?></span></li>
+		<li><strong><?php echo esc_html( number_format_i18n( $wpfpv_stats['unique_ips'] ) ); ?></strong><span><?php esc_html_e( 'Unique IPs', 'phone-validator-for-wpforms' ); ?></span></li>
+		<li><strong><?php echo esc_html( number_format_i18n( WPFPV_Honeypot::get_count() ) ); ?></strong><span><?php esc_html_e( 'Bots stopped', 'phone-validator-for-wpforms' ); ?></span></li>
+		<li><strong><?php echo esc_html( $wpfpv_stats['file_size'] ); ?></strong><span><?php esc_html_e( 'File size', 'phone-validator-for-wpforms' ); ?></span></li>
+	</ul>
+
+	<div class="wpfpv-toolbar">
+		<nav class="wpfpv-filter" aria-label="<?php esc_attr_e( 'Filter by type', 'phone-validator-for-wpforms' ); ?>">
+			<a href="<?php echo esc_url( $wpfpv_base ); ?>" class="<?php echo '' === $wpfpv_type ? 'is-active' : ''; ?>"><?php esc_html_e( 'All', 'phone-validator-for-wpforms' ); ?></a>
+			<?php foreach ( $wpfpv_types as $wpfpv_item ) : ?>
+				<a href="<?php echo esc_url( add_query_arg( 'type', strtolower( $wpfpv_item ), $wpfpv_base ) ); ?>" class="<?php echo $wpfpv_type === $wpfpv_item ? 'is-active' : ''; ?>"><?php echo esc_html( $wpfpv_labels[ $wpfpv_item ] ); ?></a>
+			<?php endforeach; ?>
+		</nav>
+
+		<div class="wpfpv-actions">
+			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+				<input type="hidden" name="action" value="wpfpv_download_log">
+				<?php wp_nonce_field( 'wpfpv_download_log' ); ?>
+				<button type="submit" class="button"><?php esc_html_e( 'Download', 'phone-validator-for-wpforms' ); ?></button>
+			</form>
+			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+				<input type="hidden" name="action" value="wpfpv_clear_log">
+				<?php wp_nonce_field( 'wpfpv_clear_log' ); ?>
+				<button type="submit" class="button button-link-delete" data-wpfpv-confirm="clear"><?php esc_html_e( 'Clear history', 'phone-validator-for-wpforms' ); ?></button>
+			</form>
+		</div>
+	</div>
+
+	<?php if ( empty( $wpfpv_rows ) ) : ?>
+		<div class="wpfpv-card wpfpv-empty">
+			<p><?php esc_html_e( 'Nothing here yet. Entries appear when someone submits a form.', 'phone-validator-for-wpforms' ); ?></p>
+		</div>
+	<?php else : ?>
+		<div class="wpfpv-card wpfpv-table-wrap">
+			<table class="widefat striped wpfpv-table">
+				<thead>
+					<tr>
+						<th scope="col"><?php esc_html_e( 'Time', 'phone-validator-for-wpforms' ); ?></th>
+						<th scope="col"><?php esc_html_e( 'Result', 'phone-validator-for-wpforms' ); ?></th>
+						<th scope="col"><?php esc_html_e( 'IP', 'phone-validator-for-wpforms' ); ?></th>
+						<th scope="col"><?php esc_html_e( 'Form', 'phone-validator-for-wpforms' ); ?></th>
+						<th scope="col"><?php esc_html_e( 'Number', 'phone-validator-for-wpforms' ); ?></th>
+						<th scope="col"><?php esc_html_e( 'Message', 'phone-validator-for-wpforms' ); ?></th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php foreach ( $wpfpv_rows as $wpfpv_row ) : ?>
+						<tr>
+							<td class="wpfpv-nowrap"><?php echo esc_html( $wpfpv_row['time'] ? wp_date( 'Y-m-d H:i:s', $wpfpv_row['time'] ) : '' ); ?></td>
+							<td><span class="wpfpv-badge wpfpv-badge--<?php echo esc_attr( strtolower( $wpfpv_row['type'] ) ); ?>"><?php echo esc_html( $wpfpv_labels[ $wpfpv_row['type'] ] ); ?></span></td>
+							<td><code><?php echo esc_html( $wpfpv_row['ip'] ); ?></code></td>
+							<td><?php echo esc_html( $wpfpv_row['form'] ); ?></td>
+							<td><?php echo esc_html( $wpfpv_row['value'] ); ?></td>
+							<td><?php echo esc_html( $wpfpv_row['message'] ); ?></td>
+						</tr>
+					<?php endforeach; ?>
+				</tbody>
+			</table>
+		</div>
+
+		<?php if ( $wpfpv_pages > 1 ) : ?>
+			<div class="tablenav bottom">
+				<div class="tablenav-pages">
+					<?php
+					echo wp_kses_post(
+						paginate_links(
+							array(
+								'base'      => add_query_arg( 'paged', '%#%', '' !== $wpfpv_type ? add_query_arg( 'type', strtolower( $wpfpv_type ), $wpfpv_base ) : $wpfpv_base ),
+								'format'    => '',
+								'current'   => $wpfpv_page,
+								'total'     => $wpfpv_pages,
+								'prev_text' => '&lsaquo;',
+								'next_text' => '&rsaquo;',
+							)
+						)
+					);
+					?>
+				</div>
+			</div>
+		<?php endif; ?>
+	<?php endif; ?>
+
+	<?php WPFPV_Admin::render_support_footer(); ?>
 </div>

@@ -1,109 +1,95 @@
 # Phone Validator for WPForms
 
-Advanced phone number validation, country code checks, and intelligent anti-spam protection for WPForms.
+Stops junk phone numbers and bots in **WPForms** (Lite and Pro): number checks for any country, input mask, honeypot, per-IP limits and a submission history.
 
 ![License](https://img.shields.io/badge/license-GPL%20v2%2B-blue.svg)
 ![WordPress](https://img.shields.io/badge/WordPress-5.6%2B-green.svg)
 ![PHP](https://img.shields.io/badge/PHP-7.4%2B-purple.svg)
 
----
+Available on WordPress.org: <https://wordpress.org/plugins/phone-validator-for-wpforms/>
 
-## 📋 Description
+## Screenshots
 
-Add professional phone number validation to your WPForms to block spam and ensure data quality. This plugin works as an addon for **WPForms (Lite & Pro)**.
+| | |
+|---|---|
+| ![Phone checks](screenshots/screenshot-1.png)<br>Phone checks: digits, repeats, sequences, blacklist | ![Countries and mask](screenshots/screenshot-2.png)<br>Countries, number format and input mask |
+| ![Honeypot and limits](screenshots/screenshot-3.png)<br>Honeypot and submission limits | ![IP detection and history settings](screenshots/screenshot-4.png)<br>Visitor IP detection and history retention |
+| ![History](screenshots/screenshot-5.png)<br>History of rejected and accepted submissions | |
 
-It validates the phone number format, checks length, detects repetitive spam patterns, and can restrict input to specific country codes. Additionally, it includes a throttling system to block spam bots from flooding your forms.
+## Why
 
----
+Paid traffic brings leads and junk: `1111111`, random digits, bots. The plugin filters them out before they reach your inbox or CRM. Install, activate, done: the defaults work out of the box.
 
-## ✨ Key Features
+## Features
 
-- **Length Validation:** Set minimum and maximum digit counts for phone numbers
-- **Anti-Spam Protection:** Automatically blocks numbers with repetitive digits (e.g., 1111111)
-- **Blacklist:** Built-in blocklist to ban specific spam numbers or patterns
-- **Country Codes:** Restrict input to specific country codes only (e.g., +7, +380, +44)
-- **Throttling:** Limit submissions from one IP address within a set timeframe
-- **Detailed Logging:** Track all validation errors and blocked attempts in a clean, searchable log
-- **Auto-Cleanup:** Automatically deletes old logs to keep your database optimized
+- **Phone rules:** minimum and maximum length, identical digits in a row, ascending and descending sequences, own blacklist.
+- **Any country:** numbers are understood in national and international form (`020 7946 0958`, `+44 20 7946 0958`, `0044 20 7946 0958`). Default country, own rules like `07 => +447`, built-in table of calling codes and lengths. Stored numbers are never modified.
+- **Allowed country codes:** accept only the countries you serve (`+1, +44, +33, +34`).
+- **Input mask:** `+1 *** *** ****` formats the field while typing; the server checks the number again, so the mask cannot be bypassed.
+- **Honeypot:** invisible field with a random per-site name (editable), blocked bots counter, note under forms visible to logged-in administrators only.
+- **Limits per IP:** minimum interval and N submissions per 24 hours, all forms together or per form, trusted IPs, administrators excluded.
+- **Correct IP behind Cloudflare and proxies:** Cloudflare built in, other proxies via a trusted list.
+- **History:** filter, paging, download, automatic cleanup. Stored in a protected file with a random name.
 
----
+## Notes
 
-## 🚀 Installation
+- The mask is applied while typing to plain phone fields. WPForms *Smart* phone fields (country selector) format themselves; the server check still applies.
+- Everything that protects the form is verified on the server; nothing depends on JavaScript.
+- The history contains phone numbers and IP addresses. It can be turned off, old entries are removed automatically (30 days by default).
 
-1. Download the plugin from this repository
-2. Upload to `/wp-content/plugins/phone-validator-for-wpforms` directory
-3. Activate the plugin through the WordPress **Plugins** screen
-4. Go to **Phone Validator** in the admin menu to configure your validation rules
-5. Done! Your WPForms are now protected
+## Requirements
 
----
+WordPress 5.6+, PHP 7.4+, WPForms 1.6+ (Lite or Pro).
 
-## 🔧 How It Works
+## Installation
 
-The plugin automatically hooks into WPForms phone fields and validates input before submission. If the number is invalid or blacklisted, the form shows a user-friendly error message and blocks the entry. No complex configuration required.
+1. Install and activate WPForms (Lite or Pro).
+2. Copy the `phone-validator-for-wpforms` folder to `wp-content/plugins/` and activate the plugin.
+3. Open **Phone Validator → Settings** and check the default country.
 
----
+## Developers
 
-## ❓ FAQ
+Settings are read through `WPFPV_Settings::get( $form_id )`, which passes the result through the `wpfpv_settings` filter, so they can be overridden per form:
 
-### Does it work with the free version of WPForms?
-Yes, it works perfectly with both **WPForms Lite** and **WPForms Pro**.
+```php
+add_filter( 'wpfpv_settings', function ( $settings, $form_id ) {
+	if ( 12 === $form_id ) {
+		$settings['allowed_country_codes'] = '+49';
+	}
+	return $settings;
+}, 10, 2 );
+```
 
-### Can I block specific numbers?
-Yes, go to the Settings page and add numbers to the Blacklist field (one per line).
+Other filters: `wpfpv_cloudflare_ranges`, `wpfpv_log_max_size`.
 
-### Where can I see blocked attempts?
-Check the **"Validation History"** to see a detailed log of all blocked submissions and validation errors.
+## Support
 
-### Does it slow down my site?
-No, validation runs only when a form is submitted. Logs are stored in a file (not database), ensuring optimal performance.
+Found a bug or have a question? Write on Telegram: [@advertsales](https://t.me/advertsales), open an [issue](https://github.com/Ilyntiy/phone-validator-for-wpforms/issues) here, or post on the [WordPress.org support forum](https://wordpress.org/support/plugin/phone-validator-for-wpforms/).
 
----
+## Credits
 
-## 📸 Screenshots
+The country calling code and number length table is generated from the open [libphonenumber](https://github.com/google/libphonenumber) metadata (Apache License 2.0).
 
-![General Settings](screenshots/settings-1.png)
-![General Settings](screenshots/settings-2.png)
-*Configure length limits, country codes, and spam protection rules*
+## Changelog
 
-![Validation History](screenshots/logs.png)
-*View logs of blocked numbers, errors, and successful submissions*
-
----
-
-## 📝 Changelog
+### 1.1.0
+- New: per-IP limit in 24 hours, trusted IPs.
+- New: input mask with server-side re-check.
+- New: honeypot with random field name, counter and administrator note.
+- New: number normalization for all countries, default country, own rules.
+- New: ascending/descending sequence check.
+- New: correct visitor IP behind Cloudflare and proxies.
+- New: history filter, paging, download; redesigned screens.
+- New: Support link on the Plugins screen and a support line at the bottom of the plugin pages.
+- Improved: protected history file with random name, size limit, safe cleanup.
+- Fixed: a number in national form (`07700 900123`) rejected when only `+44` was allowed; history forging with line breaks; uninstall left the history folder.
 
 ### 1.0.1
-- Fixed: Correct IPv6 address counting in logging system
-- Improved: IP address detection now properly handles both IPv4 and IPv6 formats
+- Fixed: correct IPv6 address counting in logging.
 
 ### 1.0.0
-- Initial public release
-- Includes advanced validation, spam protection, and logging features
+- Initial release.
 
----
+## License
 
-## 🛠️ Requirements
-
-- **WordPress:** 5.6+
-- **PHP:** 7.4+
-- **WPForms:** 1.6+ (Lite or Pro)
-
----
-
-## 📄 License
-
-This plugin is licensed under the [GPLv2 or later](https://www.gnu.org/licenses/gpl-2.0.html).
-
----
-
-## 👤 Author
-
-**Ilyntiy**  
-📧 Support: [Telegram](https://t.me/advertsales)
-
----
-
-## ⭐ Support
-
-If you find this plugin useful, please give it a star on GitHub!
+GPL v2 or later. See [LICENSE](LICENSE).

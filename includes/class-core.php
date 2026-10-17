@@ -1,127 +1,164 @@
 <?php
 /**
- * Plugin Core
+ * Plugin bootstrap: components, upgrade routine, activation.
+ *
+ * @package PhoneValidatorForWPForms
  */
 
-if (!defined('ABSPATH')) {
-    exit;
-}
-
-class WPFPV_Core {
-    
-    private static $instance = null;
-    
-    public static function instance() {
-        if (is_null(self::$instance)) {
-            self::$instance = new self();
-        }
-        return self::$instance;
-    }
-    
-    private function __construct() {
-        $this->check_dependencies();
-        $this->init_components();
-    }
-    
-    /**
-     * Check dependencies
-     */
-    private function check_dependencies() {
-        if (!function_exists('wpforms')) {
-            add_action('admin_notices', array($this, 'wpforms_missing_notice'));
-            return;
-        }
-    }
-    
-    /**
-     * Initialize components
-     */
-    private function init_components() {
-        if (!function_exists('wpforms')) {
-            return;
-        }
-        
-        WPFPV_Settings::instance();
-        WPFPV_Logger::instance();
-        WPFPV_Validator::instance();
-        WPFPV_Throttle::instance();
-        
-        if (is_admin()) {
-            WPFPV_Admin::instance();
-        }
-    }
-    
-    /**
-     * WPForms missing notice
-     */
-    public function wpforms_missing_notice() {
-        ?>
-        <div class="notice notice-error">
-            <p>
-                <strong><?php esc_html_e('Phone Validator for WPForms', 'phone-validator-for-wpforms'); ?></strong> 
-                <?php esc_html_e('requires WPForms plugin to be activated!', 'phone-validator-for-wpforms'); ?>
-            </p>
-        </div>
-        <?php
-    }
-    
-    /**
-     * Plugin Activation
-     */
-public static function activate() {
-    if (!get_option('wpfpv_settings')) {
-        add_option('wpfpv_settings', WPFPV_Settings::get_defaults());
-    }
-    
-    // Create protected log directory
-    self::setup_log_directory();
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
 /**
- * Setup log directory with protection
+ * Plugin core.
  */
-    private static function setup_log_directory() {
-        // Create directory if not exists
-        if (!file_exists(WPFPV_LOG_DIR)) {
-            wp_mkdir_p(WPFPV_LOG_DIR);
-        }
-        
-        // Check if writable
-        if (!is_writable(WPFPV_LOG_DIR)) {
-            return false;
-        }
-        
-        // Create empty log file
-        if (!file_exists(WPFPV_LOG_FILE)) {
-            file_put_contents(WPFPV_LOG_FILE, '');
-        }
-        
-        // Create .htaccess for Apache protection
-        $htaccess_file = WPFPV_LOG_DIR . '/.htaccess';
-        if (!file_exists($htaccess_file)) {
-            $htaccess_content = "# Deny all access\n";
-            $htaccess_content .= "Order deny,allow\n";
-            $htaccess_content .= "Deny from all\n";
-            file_put_contents($htaccess_file, $htaccess_content);
-        }
-        
-        // Create index.php for extra protection
-        $index_file = WPFPV_LOG_DIR . '/index.php';
-        if (!file_exists($index_file)) {
-            file_put_contents($index_file, '<?php // Silence is golden');
-        }
-        
-        return true;
-    }
+class WPFPV_Core {
 
-    
-    /**
-     * Plugin Deactivation
-     */
-    public static function deactivate() {
-        $timestamp = wp_next_scheduled('wpfpv_daily_cleanup');
-        if ($timestamp) {
-            wp_unschedule_event($timestamp, 'wpfpv_daily_cleanup');
-        }
-    }
+	const SCHEMA_OPTION = 'wpfpv_schema';
+	const SCHEMA        = 2;
+	const CRON_HOOK     = 'wpfpv_daily_cleanup';
+
+	/**
+	 * Singleton instance.
+	 *
+	 * @var WPFPV_Core|null
+	 */
+	private static $instance = null;
+
+	/**
+	 * Get the instance.
+	 *
+	 * @return WPFPV_Core
+	 */
+	public static function instance() {
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
+		}
+		return self::$instance;
+	}
+
+	/**
+	 * Constructor.
+	 */
+	private function __construct() {
+		// Registered even without WPForms, so old log entries are still removed.
+		add_action( self::CRON_HOOK, array( 'WPFPV_Logger', 'cleanup_old_logs' ) );
+
+		WPFPV_Settings::instance();
+
+		if ( is_admin() ) {
+			WPFPV_Admin::instance();
+			add_action( 'admin_init', array( $this, 'maybe_upgrade' ) );
+		}
+
+		if ( ! function_exists( 'wpforms' ) ) {
+			add_action( 'admin_notices', array( $this, 'wpforms_missing_notice' ) );
+			return;
+		}
+
+		WPFPV_Validator::instance();
+		WPFPV_Throttle::instance();
+		WPFPV_Honeypot::instance();
+		WPFPV_Frontend::instance();
+	}
+
+	/**
+	 * Run the upgrade steps once after the plugin files were updated.
+	 */
+	public function maybe_upgrade() {
+		if ( (int) get_option( self::SCHEMA_OPTION, 0 ) < self::SCHEMA ) {
+			self::upgrade();
+		}
+	}
+
+	/**
+	 * Upgrade steps, safe to run more than once.
+	 */
+	private static function upgrade() {
+		// Settings of earlier versions are kept: missing keys fall back to defaults,
+		// so the honeypot is on, the limit and the mask are off.
+		WPFPV_Logger::migrate_legacy_log();
+		self::drop_redundant_blacklist_entries();
+		self::schedule_cleanup();
+		update_option( self::SCHEMA_OPTION, self::SCHEMA, false );
+	}
+
+	/**
+	 * Version 1.0 shipped 111111 ... 000000 in the blacklist. The "identical digits in a row"
+	 * check covers them, so they are removed, but only when that check is on and would catch them.
+	 */
+	private static function drop_redundant_blacklist_entries() {
+		$saved = get_option( WPFPV_Settings::OPTION );
+		if ( ! is_array( $saved ) || ! isset( $saved['blacklist'] ) || ! is_string( $saved['blacklist'] ) ) {
+			return;
+		}
+
+		$repeats = isset( $saved['max_repeats'] ) ? (int) $saved['max_repeats'] : 5;
+		if ( $repeats < 1 || $repeats > 5 ) {
+			return;
+		}
+
+		$redundant = array( '111111', '222222', '333333', '444444', '555555', '666666', '777777', '888888', '999999', '000000' );
+		$kept      = array();
+		foreach ( preg_split( '/\R/', $saved['blacklist'] ) as $line ) {
+			if ( ! in_array( trim( $line ), $redundant, true ) ) {
+				$kept[] = $line;
+			}
+		}
+
+		$blacklist = implode( "\n", $kept );
+		if ( $blacklist !== $saved['blacklist'] ) {
+			$saved['blacklist'] = trim( $blacklist );
+			update_option( WPFPV_Settings::OPTION, $saved );
+		}
+	}
+
+	/**
+	 * Notice shown when WPForms is not active.
+	 */
+	public function wpforms_missing_notice() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+		?>
+		<div class="notice notice-error">
+			<p>
+				<strong><?php esc_html_e( 'Phone Validator for WPForms', 'phone-validator-for-wpforms' ); ?></strong>
+				<?php esc_html_e( 'requires the WPForms plugin (Lite or Pro) to be installed and activated.', 'phone-validator-for-wpforms' ); ?>
+			</p>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Plugin activation.
+	 */
+	public static function activate() {
+		if ( false === get_option( WPFPV_Settings::OPTION ) ) {
+			$defaults = WPFPV_Settings::get_defaults();
+
+			// A fresh install guesses the default country from the site language.
+			$defaults['default_country'] = WPFPV_Phone::country_from_locale( get_locale() );
+			add_option( WPFPV_Settings::OPTION, $defaults, '', false );
+		}
+
+		WPFPV_Logger::ensure_dir();
+		self::upgrade();
+	}
+
+	/**
+	 * Plugin deactivation.
+	 */
+	public static function deactivate() {
+		wp_clear_scheduled_hook( self::CRON_HOOK );
+	}
+
+	/**
+	 * Make sure the daily cleanup is scheduled.
+	 */
+	private static function schedule_cleanup() {
+		if ( ! wp_next_scheduled( self::CRON_HOOK ) ) {
+			wp_schedule_event( time() + HOUR_IN_SECONDS, 'daily', self::CRON_HOOK );
+		}
+	}
 }

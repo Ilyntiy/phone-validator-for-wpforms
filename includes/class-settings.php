@@ -1,228 +1,369 @@
 <?php
 /**
- * Settings Management
+ * Settings management.
+ *
+ * @package PhoneValidatorForWPForms
  */
 
-if (!defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
+/**
+ * Defaults, retrieval and sanitization of plugin settings.
+ */
 class WPFPV_Settings {
-    
-    private static $instance = null;
-    
-    public static function instance() {
-        if (is_null(self::$instance)) {
-            self::$instance = new self();
-        }
-        return self::$instance;
-    }
-    
-    private function __construct() {
-        add_action('admin_init', array($this, 'register_settings'));
-    }
-    
-    /**
-     * Default settings
-     */
-    public static function get_defaults() {
-        return array(
-            'min_length' => 6,
-            'max_length' => 15,
-            'max_repeats' => 5,
-            'allowed_country_codes' => '',
-            'enable_logging' => 1,
-            'auto_clean_logs' => 30,
-            'throttle_time' => 3,
-            'blacklist' => "111111\n222222\n333333\n444444\n555555\n666666\n777777\n888888\n999999\n000000\n1234567890\n0987654321"
-        );
-    }
-    
-    /**
-     * Get settings
-     */
-    public static function get() {
-        $defaults = self::get_defaults();
-        $settings = get_option('wpfpv_settings', $defaults);
-        return wp_parse_args($settings, $defaults);
-    }
-    
-    /**
-     * Register settings
-     */
-    public function register_settings() {
-        register_setting('wpfpv_settings_group', 'wpfpv_settings', array($this, 'validate'));
-        
-        // General Settings
-        add_settings_section('wpfpv_main', __('General Rules', 'phone-validator-for-wpforms'), 
-            array($this, 'section_main'), 'wpfpv-settings');
-        
-        add_settings_field('min_length', __('Minimum length (digits)', 'phone-validator-for-wpforms'), 
-            array($this, 'field_min_length'), 'wpfpv-settings', 'wpfpv_main');
-        
-        add_settings_field('max_length', __('Maximum length (digits)', 'phone-validator-for-wpforms'), 
-            array($this, 'field_max_length'), 'wpfpv-settings', 'wpfpv_main');
-        
-        add_settings_field('max_repeats', __('Max consecutive identical digits', 'phone-validator-for-wpforms'), 
-            array($this, 'field_max_repeats'), 'wpfpv-settings', 'wpfpv_main');
-        
-        // Advanced Checks
-        add_settings_section('wpfpv_advanced', __('Advanced Checks', 'phone-validator-for-wpforms'), 
-            array($this, 'section_advanced'), 'wpfpv-settings');
-        
-        add_settings_field('blacklist', __('Blacklist', 'phone-validator-for-wpforms'), 
-            array($this, 'field_blacklist'), 'wpfpv-settings', 'wpfpv_advanced');
-        
-        add_settings_field('allowed_country_codes', __('Allowed country codes', 'phone-validator-for-wpforms'), 
-            array($this, 'field_country_codes'), 'wpfpv-settings', 'wpfpv_advanced');
-        
-        // Security System
-        add_settings_section('wpfpv_system', __('Security System', 'phone-validator-for-wpforms'), 
-            array($this, 'section_system'), 'wpfpv-settings');
-        
-        add_settings_field('throttle_time', __('Submission interval (min)', 'phone-validator-for-wpforms'), 
-            array($this, 'field_throttle'), 'wpfpv-settings', 'wpfpv_system');
-        
-        add_settings_field('enable_logging', __('Enable logging', 'phone-validator-for-wpforms'), 
-            array($this, 'field_logging'), 'wpfpv-settings', 'wpfpv_system');
-        
-        add_settings_field('auto_clean_logs', __('Auto-clean logs (days)', 'phone-validator-for-wpforms'), 
-            array($this, 'field_auto_clean'), 'wpfpv-settings', 'wpfpv_system');
-    }
-    
-    /**
-     * Section: General Rules
-     */
-    public function section_main() {
-        echo '<p class="wpfpv-section-desc">' . esc_html__('Basic phone number validation parameters', 'phone-validator-for-wpforms') . '</p>';
-    }
-    
-    /**
-     * Section: Advanced Checks
-     */
-    public function section_advanced() {
-        echo '<p class="wpfpv-section-desc">' . esc_html__('Protection against spam and fake numbers', 'phone-validator-for-wpforms') . '</p>';
-    }
-    
-    /**
-     * Section: Security System
-     */
-    public function section_system() {
-        echo '<p class="wpfpv-section-desc">' . esc_html__('Settings for repeat submission protection and logging', 'phone-validator-for-wpforms') . '</p>';
-    }
-    
-    /**
-     * Field: Minimum length
-     */
-    public function field_min_length() {
-        $settings = self::get();
-        ?>
-        <input type="number" name="wpfpv_settings[min_length]" value="<?php echo esc_attr($settings['min_length']); ?>" min="1" max="20" class="wpfpv-input-number">
-        <p class="description"><?php esc_html_e('Minimum number of digits (recommended 6-10)', 'phone-validator-for-wpforms'); ?></p>
-        <?php
-    }
-    
-    /**
-     * Field: Maximum length
-     */
-    public function field_max_length() {
-        $settings = self::get();
-        ?>
-        <input type="number" name="wpfpv_settings[max_length]" value="<?php echo esc_attr($settings['max_length']); ?>" min="5" max="20" class="wpfpv-input-number">
-        <p class="description"><?php esc_html_e('Maximum number of digits (recommended 11-15)', 'phone-validator-for-wpforms'); ?></p>
-        <?php
-    }
-    
-    /**
-     * Field: Max consecutive identical digits
-     */
-    public function field_max_repeats() {
-        $settings = self::get();
-        ?>
-        <input type="number" name="wpfpv_settings[max_repeats]" value="<?php echo esc_attr($settings['max_repeats']); ?>" min="2" max="10" class="wpfpv-input-number">
-        <p class="description"><?php esc_html_e('Blocks entries with too many identical consecutive digits', 'phone-validator-for-wpforms'); ?></p>
-        <?php
-    }
-       
-    /**
-     * Field: Blacklist
-     */
-    public function field_blacklist() {
-        $settings = self::get();
-        ?>
-        <textarea name="wpfpv_settings[blacklist]" rows="6" class="wpfpv-textarea"><?php echo esc_textarea($settings['blacklist']); ?></textarea>
-        <p class="description"><?php esc_html_e('One number per line (digits only)', 'phone-validator-for-wpforms'); ?></p>
-        <?php
-    }
-    
-    /**
-     * Field: Country codes
-     */
-    public function field_country_codes() {
-        $settings = self::get();
-        ?>
-        <input type="text" name="wpfpv_settings[allowed_country_codes]" value="<?php echo esc_attr($settings['allowed_country_codes']); ?>" class="wpfpv-input-text" placeholder="+7, +380, +375">
-        <p class="description"><?php esc_html_e('Comma separated. Empty = all codes allowed', 'phone-validator-for-wpforms'); ?></p>
-        <?php
-    }
-    
-    /**
-     * Field: Submission interval
-     */
-    public function field_throttle() {
-        $settings = self::get();
-        ?>
-        <input type="number" name="wpfpv_settings[throttle_time]" value="<?php echo esc_attr($settings['throttle_time']); ?>" min="0" max="60" class="wpfpv-input-number">
-        <p class="description"><?php esc_html_e('Minimum interval between successful submissions (0 = disabled)', 'phone-validator-for-wpforms'); ?></p>
-        <?php
-    }
-    
-    /**
-     * Field: Enable logging
-     */
-    public function field_logging() {
-        $settings = self::get();
-        ?>
-        <label class="wpfpv-switch">
-            <input type="checkbox" name="wpfpv_settings[enable_logging]" value="1" <?php checked(1, $settings['enable_logging']); ?>>
-            <span class="wpfpv-slider"></span>
-        </label>
-        <span class="wpfpv-switch-label"><?php esc_html_e('Log validation errors', 'phone-validator-for-wpforms'); ?></span>
-        <?php
-    }
-    
-    /**
-     * Field: Auto-clean logs
-     */
-    public function field_auto_clean() {
-        $settings = self::get();
-        ?>
-        <input type="number" name="wpfpv_settings[auto_clean_logs]" value="<?php echo esc_attr($settings['auto_clean_logs']); ?>" min="0" max="365" class="wpfpv-input-number">
-        <p class="description"><?php esc_html_e('Delete logs older than specified number of days (0 = disabled)', 'phone-validator-for-wpforms'); ?></p>
-        <?php
-    }
-    
-    /**
-     * Validate settings
-     */
-    public function validate($input) {
-        $output = array();
-        
-        $output['min_length'] = absint($input['min_length']);
-        $output['max_length'] = absint($input['max_length']);
-        $output['max_repeats'] = absint($input['max_repeats']);
-        $output['allowed_country_codes'] = sanitize_text_field($input['allowed_country_codes']);
-        $output['enable_logging'] = isset($input['enable_logging']) ? 1 : 0;
-        $output['auto_clean_logs'] = absint($input['auto_clean_logs']);
-        $output['throttle_time'] = absint($input['throttle_time']);
-        $output['blacklist'] = sanitize_textarea_field($input['blacklist']);
-        
-        if ($output['min_length'] > $output['max_length']) {
-            add_settings_error('wpfpv_settings', 'invalid_length', 
-                __('Minimum length cannot be greater than maximum length!', 'phone-validator-for-wpforms'));
-            $output['min_length'] = $output['max_length'];
-        }
-        
-        return $output;
-    }
+
+	const OPTION = 'wpfpv_settings';
+	const GROUP  = 'wpfpv_settings_group';
+
+	/**
+	 * Singleton instance.
+	 *
+	 * @var WPFPV_Settings|null
+	 */
+	private static $instance = null;
+
+	/**
+	 * Request-level cache of saved settings merged with defaults.
+	 *
+	 * @var array|null
+	 */
+	private static $cache = null;
+
+	/**
+	 * Get the instance.
+	 *
+	 * @return WPFPV_Settings
+	 */
+	public static function instance() {
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
+		}
+		return self::$instance;
+	}
+
+	/**
+	 * Constructor.
+	 */
+	private function __construct() {
+		add_action( 'admin_init', array( $this, 'register_settings' ) );
+
+		foreach ( array( 'add_option_', 'update_option_', 'delete_option_' ) as $prefix ) {
+			add_action( $prefix . self::OPTION, array( __CLASS__, 'flush_cache' ) );
+		}
+	}
+
+	/**
+	 * Forget the cached settings.
+	 */
+	public static function flush_cache() {
+		self::$cache = null;
+	}
+
+	/**
+	 * Default settings.
+	 *
+	 * @return array
+	 */
+	public static function get_defaults() {
+		return array(
+			// General rules.
+			'min_length'            => 6,
+			'max_length'            => 15,
+			'max_repeats'           => 5,
+			'sequence_length'       => 7,
+
+			// Number normalization.
+			'countries_enabled'     => 1,
+			'default_country'       => '',
+			'custom_rules'          => '',
+
+			// Advanced checks.
+			'blacklist'             => "1234567890\n0987654321",
+			'allowed_country_codes' => '',
+
+			// Input mask.
+			'mask_enabled'          => 0,
+			'masks'                 => '',
+
+			// Honeypot.
+			'honeypot_enabled'      => 1,
+			'honeypot_field_name'   => '',
+			'honeypot_indicator'    => 1,
+
+			// Rate limiting.
+			'limits_enabled'        => 1,
+			'throttle_time'         => 3,
+			'daily_limit'           => 0,
+			'limit_scope'           => 'site',
+			'whitelist_ips'         => '',
+			'exempt_admins'         => 1,
+
+			// Visitor IP detection.
+			'proxy_mode'            => 'none',
+			'proxy_header'          => 'X-Forwarded-For',
+			'trusted_proxies'       => '',
+
+			// Logging.
+			'enable_logging'        => 1,
+			'auto_clean_logs'       => 30,
+		);
+	}
+
+	/**
+	 * Saved settings merged with defaults.
+	 *
+	 * @return array
+	 */
+	private static function get_saved() {
+		if ( null === self::$cache ) {
+			$saved       = get_option( self::OPTION, array() );
+			self::$cache = wp_parse_args( is_array( $saved ) ? $saved : array(), self::get_defaults() );
+		}
+		return self::$cache;
+	}
+
+	/**
+	 * Get settings.
+	 *
+	 * @param int $form_id Optional form ID, reserved for per-form overrides via the filter.
+	 * @return array
+	 */
+	public static function get( $form_id = 0 ) {
+		/**
+		 * Filters the settings used for a request (and optionally a single form).
+		 *
+		 * @param array $settings Settings.
+		 * @param int   $form_id  WPForms form ID, 0 when unknown.
+		 */
+		return apply_filters( 'wpfpv_settings', self::get_saved(), absint( $form_id ) );
+	}
+
+	/**
+	 * Name of the honeypot field: the saved name, or a stable per-site default.
+	 *
+	 * @return string
+	 */
+	public static function honeypot_name() {
+		$settings = self::get_saved();
+		$name     = $settings['honeypot_field_name'];
+
+		if ( ! self::is_valid_field_name( $name ) ) {
+			$name = 'h' . substr( wp_hash( 'wpfpv-honeypot' ), 0, 11 );
+		}
+
+		return $name;
+	}
+
+	/**
+	 * Is the string usable as honeypot field name?
+	 *
+	 * @param string $name Name.
+	 * @return bool
+	 */
+	public static function is_valid_field_name( $name ) {
+		$reserved = array( 'wpforms', 'hp', 'action', 'submit', 'id', 'form_id', 'nonce' );
+
+		return is_string( $name )
+			&& 1 === preg_match( '/^[a-z][a-z0-9_]{5,31}$/', $name )
+			&& ! in_array( $name, $reserved, true );
+	}
+
+	/**
+	 * Register the setting.
+	 */
+	public function register_settings() {
+		register_setting(
+			self::GROUP,
+			self::OPTION,
+			array(
+				'type'              => 'array',
+				'sanitize_callback' => array( __CLASS__, 'sanitize' ),
+				'default'           => self::get_defaults(),
+			)
+		);
+	}
+
+	/**
+	 * Sanitize and validate submitted settings.
+	 *
+	 * @param mixed $input Submitted values.
+	 * @return array
+	 */
+	public static function sanitize( $input ) {
+		$input    = is_array( $input ) ? $input : array();
+		$previous = self::get_saved();
+		$defaults = self::get_defaults();
+		$out      = array();
+
+		// General rules.
+		$out['min_length']      = self::int_between( $input, 'min_length', 1, 20, $previous['min_length'] );
+		$out['max_length']      = self::int_between( $input, 'max_length', 5, 20, $previous['max_length'] );
+		$out['max_repeats']     = self::int_between( $input, 'max_repeats', 0, 10, $previous['max_repeats'] );
+		$out['sequence_length'] = self::int_between( $input, 'sequence_length', 0, 10, $previous['sequence_length'] );
+
+		if ( $out['max_repeats'] > 0 && $out['max_repeats'] < 2 ) {
+			$out['max_repeats'] = 2;
+		}
+		if ( $out['sequence_length'] > 0 && $out['sequence_length'] < 4 ) {
+			$out['sequence_length'] = 4;
+		}
+		if ( $out['min_length'] > $out['max_length'] ) {
+			add_settings_error( self::OPTION, 'invalid_length', __( 'Minimum length cannot be greater than maximum length. The previous values were kept.', 'phone-validator-for-wpforms' ) );
+			$out['min_length'] = (int) $previous['min_length'];
+			$out['max_length'] = (int) $previous['max_length'];
+		}
+
+		// Number normalization.
+		$out['countries_enabled'] = empty( $input['countries_enabled'] ) ? 0 : 1;
+
+		$countries              = WPFPV_Phone::countries();
+		$country                = strtoupper( self::text( $input, 'default_country' ) );
+		$out['default_country'] = isset( $countries[ $country ] ) ? $country : '';
+
+		$rules = WPFPV_Phone::parse_rules( self::textarea( $input, 'custom_rules' ) );
+		/* translators: %s: rejected lines, one after another. */
+		self::report_invalid( $rules['invalid'], 'invalid_rules', __( 'These conversion rules were ignored (use the form "07 => +447"): %s', 'phone-validator-for-wpforms' ) );
+		$lines = array();
+		foreach ( $rules['rules'] as $rule ) {
+			$lines[ $rule[0] . '=>' . $rule[1] ] = $rule[0] . ' => +' . $rule[1];
+		}
+		$out['custom_rules'] = implode( "\n", $lines );
+
+		// Advanced checks.
+		$out['blacklist']             = self::sanitize_blacklist( self::textarea( $input, 'blacklist' ) );
+		$codes                        = WPFPV_Validator::parse_codes( self::text( $input, 'allowed_country_codes' ) );
+		$out['allowed_country_codes'] = empty( $codes ) ? '' : '+' . implode( ', +', $codes );
+
+		// Input mask.
+		$out['mask_enabled'] = empty( $input['mask_enabled'] ) ? 0 : 1;
+		$masks               = WPFPV_Mask::parse( self::textarea( $input, 'masks' ) );
+		/* translators: %s: rejected lines, one after another. */
+		self::report_invalid( $masks['invalid'], 'invalid_masks', __( 'These masks were ignored (use digits and "*" for any digit, 5 to 20 positions, for example "+1 *** *** ****"): %s', 'phone-validator-for-wpforms' ) );
+		$mask_lines = array();
+		foreach ( $masks['masks'] as $mask ) {
+			$mask_lines[] = $mask['mask'];
+		}
+		$out['masks'] = implode( "\n", $mask_lines );
+		if ( $out['mask_enabled'] && empty( $mask_lines ) ) {
+			add_settings_error( self::OPTION, 'mask_empty', __( 'The input mask is enabled but no valid mask is defined, so it stays inactive.', 'phone-validator-for-wpforms' ), 'warning' );
+		}
+
+		// Honeypot.
+		$out['honeypot_enabled']   = empty( $input['honeypot_enabled'] ) ? 0 : 1;
+		$out['honeypot_indicator'] = empty( $input['honeypot_indicator'] ) ? 0 : 1;
+		$name                      = strtolower( self::text( $input, 'honeypot_field_name' ) );
+		if ( '' !== $name && ! self::is_valid_field_name( $name ) ) {
+			add_settings_error( self::OPTION, 'invalid_honeypot_name', __( 'The honeypot field name must be 6 to 32 characters: lowercase letters, digits and underscores, starting with a letter. The previous name was kept.', 'phone-validator-for-wpforms' ) );
+			$name = $previous['honeypot_field_name'];
+		}
+		$out['honeypot_field_name'] = $name;
+
+		// Rate limiting.
+		$out['limits_enabled'] = empty( $input['limits_enabled'] ) ? 0 : 1;
+		$out['throttle_time']  = self::int_between( $input, 'throttle_time', 0, 1440, $previous['throttle_time'] );
+		$out['daily_limit']    = self::int_between( $input, 'daily_limit', 0, 1000, $previous['daily_limit'] );
+		$out['limit_scope']    = ( 'form' === self::text( $input, 'limit_scope' ) ) ? 'form' : 'site';
+		$out['exempt_admins']  = empty( $input['exempt_admins'] ) ? 0 : 1;
+
+		$whitelist = WPFPV_IP::parse_list( self::textarea( $input, 'whitelist_ips' ) );
+		/* translators: %s: rejected lines, one after another. */
+		self::report_invalid( $whitelist['invalid'], 'invalid_whitelist', __( 'These addresses are not valid IPs or CIDR ranges and were ignored: %s', 'phone-validator-for-wpforms' ) );
+		$out['whitelist_ips'] = implode( "\n", $whitelist['valid'] );
+
+		// Visitor IP detection.
+		$mode                = sanitize_key( self::text( $input, 'proxy_mode' ) );
+		$out['proxy_mode']   = in_array( $mode, array( 'none', 'cloudflare', 'custom' ), true ) ? $mode : 'none';
+		$header              = self::text( $input, 'proxy_header' );
+		$out['proxy_header'] = in_array( $header, WPFPV_IP::allowed_headers(), true ) ? $header : $defaults['proxy_header'];
+
+		$proxies = WPFPV_IP::parse_list( self::textarea( $input, 'trusted_proxies' ) );
+		/* translators: %s: rejected lines, one after another. */
+		self::report_invalid( $proxies['invalid'], 'invalid_proxies', __( 'These addresses are not valid IPs or CIDR ranges and were ignored: %s', 'phone-validator-for-wpforms' ) );
+		$out['trusted_proxies'] = implode( "\n", $proxies['valid'] );
+		if ( 'custom' === $out['proxy_mode'] && empty( $proxies['valid'] ) ) {
+			add_settings_error( self::OPTION, 'proxy_empty', __( 'Add at least one trusted proxy address, otherwise the proxy header cannot be trusted. The IP detection mode was reset to "REMOTE_ADDR only".', 'phone-validator-for-wpforms' ) );
+			$out['proxy_mode'] = 'none';
+		}
+
+		// Logging.
+		$out['enable_logging']  = empty( $input['enable_logging'] ) ? 0 : 1;
+		$out['auto_clean_logs'] = self::int_between( $input, 'auto_clean_logs', 0, 365, $previous['auto_clean_logs'] );
+
+		return $out;
+	}
+
+	/**
+	 * Single-line text value from the submitted array.
+	 *
+	 * @param array  $input Submitted values.
+	 * @param string $key   Key.
+	 * @return string
+	 */
+	private static function text( array $input, $key ) {
+		return ( isset( $input[ $key ] ) && is_scalar( $input[ $key ] ) ) ? trim( sanitize_text_field( (string) $input[ $key ] ) ) : '';
+	}
+
+	/**
+	 * Multi-line text value from the submitted array.
+	 *
+	 * @param array  $input Submitted values.
+	 * @param string $key   Key.
+	 * @return string
+	 */
+	private static function textarea( array $input, $key ) {
+		return ( isset( $input[ $key ] ) && is_scalar( $input[ $key ] ) ) ? sanitize_textarea_field( (string) $input[ $key ] ) : '';
+	}
+
+	/**
+	 * Integer in a range, falling back when missing or not numeric.
+	 *
+	 * @param array  $input    Submitted values.
+	 * @param string $key      Key.
+	 * @param int    $min      Minimum.
+	 * @param int    $max      Maximum.
+	 * @param int    $fallback Value used when the key is missing or invalid.
+	 * @return int
+	 */
+	private static function int_between( array $input, $key, $min, $max, $fallback ) {
+		if ( ! isset( $input[ $key ] ) || ! is_numeric( $input[ $key ] ) ) {
+			return (int) $fallback;
+		}
+		return max( $min, min( $max, (int) $input[ $key ] ) );
+	}
+
+	/**
+	 * Keep only digits and common phone punctuation in the blacklist, one entry per line.
+	 *
+	 * @param string $text Raw text.
+	 * @return string
+	 */
+	private static function sanitize_blacklist( $text ) {
+		$entries = array();
+		foreach ( preg_split( '/\R/', (string) $text ) as $line ) {
+			$line = trim( preg_replace( '/[^0-9+\s().\-]/', '', $line ) );
+			if ( 1 === preg_match( '/\d/', $line ) ) {
+				$entries[ $line ] = $line;
+			}
+			if ( count( $entries ) >= 5000 ) {
+				break;
+			}
+		}
+		return implode( "\n", $entries );
+	}
+
+	/**
+	 * Add a settings error listing ignored lines.
+	 *
+	 * @param string[] $invalid  Ignored lines.
+	 * @param string   $code     Error code.
+	 * @param string   $template Message with one %s placeholder.
+	 */
+	private static function report_invalid( array $invalid, $code, $template ) {
+		if ( empty( $invalid ) ) {
+			return;
+		}
+		add_settings_error( self::OPTION, $code, sprintf( $template, esc_html( implode( ', ', array_slice( $invalid, 0, 5 ) ) ) ) );
+	}
 }
