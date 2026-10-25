@@ -3,7 +3,7 @@
  * Plugin Name:       Phone Validator for WPForms
  * Plugin URI:        https://github.com/Ilyntiy/phone-validator-for-wpforms
  * Description:       Filters junk and bot leads in WPForms: phone validation for any country, input mask, honeypot, per-IP limits and a submission log.
- * Version:           1.1.0
+ * Version:           1.1.1
  * Requires at least: 5.6
  * Requires PHP:      7.4
  * Author:            Ilyntiy
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'WPFPV_VERSION', '1.1.0' );
+define( 'WPFPV_VERSION', '1.1.1' );
 define( 'WPFPV_PLUGIN_FILE', __FILE__ );
 define( 'WPFPV_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'WPFPV_PLUGIN_URL', plugin_dir_url( __FILE__ ) );

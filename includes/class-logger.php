@@ -31,7 +31,7 @@ class WPFPV_Logger {
 	 * @return string[]
 	 */
 	public static function types() {
-		return array( 'VALIDATION', 'THROTTLE', 'LIMIT', 'HONEYPOT', 'SUCCESS' );
+		return array( 'VALIDATION', 'THROTTLE', 'LIMIT', 'HONEYPOT', 'BOTCHECK', 'NOJS', 'SUCCESS' );
 	}
 
 	/**

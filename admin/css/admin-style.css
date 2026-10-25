@@ -256,9 +256,15 @@
 	background: #ffecc7;
 }
 
-.wpfpv-badge--honeypot {
+.wpfpv-badge--honeypot,
+.wpfpv-badge--botcheck {
 	color: #1e3a8a;
 	background: #e3ebfb;
+}
+
+.wpfpv-badge--nojs {
+	color: #7a3b00;
+	background: #ffecc7;
 }
 
 .wpfpv-badge--other {
@@ -427,4 +433,8 @@
 	margin: 24px 0 8px;
 	color: var(--wpfpv-muted);
 	font-size: 13px;
+}
+
+.wpfpv-rec strong {
+	color: #1d6b3a;
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * Front-end assets: the phone input mask.
+ * Front-end assets: the phone input mask and the browser check.
  *
  * @package PhoneValidatorForWPForms
  */
@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Loads the mask script on pages that contain a WPForms form.
+ * Loads the scripts on pages that contain a WPForms form.
  */
 class WPFPV_Frontend {
 
@@ -22,11 +22,18 @@ class WPFPV_Frontend {
 	private static $instance = null;
 
 	/**
-	 * Has the script already been queued on this page?
+	 * Has the mask script already been queued on this page?
 	 *
 	 * @var bool
 	 */
-	private $queued = false;
+	private $mask_queued = false;
+
+	/**
+	 * Has the browser-check script already been queued on this page?
+	 *
+	 * @var bool
+	 */
+	private $guard_queued = false;
 
 	/**
 	 * Get the instance.
@@ -49,17 +56,24 @@ class WPFPV_Frontend {
 	}
 
 	/**
-	 * Enqueue the mask script.
+	 * Enqueue the scripts the form needs.
 	 *
 	 * @param array $form_data Form data.
 	 */
 	public function enqueue( $form_data ) {
-		if ( $this->queued ) {
-			return;
-		}
-
 		$settings = WPFPV_Settings::get( isset( $form_data['id'] ) ? $form_data['id'] : 0 );
-		if ( empty( $settings['mask_enabled'] ) ) {
+
+		$this->enqueue_mask( $settings );
+		$this->enqueue_guard( $settings );
+	}
+
+	/**
+	 * Enqueue the mask script.
+	 *
+	 * @param array $settings Settings of the form.
+	 */
+	private function enqueue_mask( array $settings ) {
+		if ( $this->mask_queued || empty( $settings['mask_enabled'] ) ) {
 			return;
 		}
 
@@ -68,7 +82,7 @@ class WPFPV_Frontend {
 			return;
 		}
 
-		$this->queued = true;
+		$this->mask_queued = true;
 
 		wp_enqueue_script(
 			'wpfpv-mask',
@@ -86,6 +100,33 @@ class WPFPV_Frontend {
 		wp_add_inline_script(
 			'wpfpv-mask',
 			'window.wpfpvMaskConfig = ' . wp_json_encode( $config ) . ';',
+			'before'
+		);
+	}
+
+	/**
+	 * Enqueue the browser-check script.
+	 *
+	 * @param array $settings Settings of the form.
+	 */
+	private function enqueue_guard( array $settings ) {
+		if ( $this->guard_queued || empty( $settings['honeypot_enabled'] ) ) {
+			return;
+		}
+
+		$this->guard_queued = true;
+
+		wp_enqueue_script(
+			'wpfpv-guard',
+			WPFPV_PLUGIN_URL . 'assets/js/guard.js',
+			array(),
+			WPFPV_VERSION,
+			true
+		);
+
+		wp_add_inline_script(
+			'wpfpv-guard',
+			'window.wpfpvGuardConfig = ' . wp_json_encode( array( 'name' => WPFPV_Settings::guard_name() ) ) . ';',
 			'before'
 		);
 	}

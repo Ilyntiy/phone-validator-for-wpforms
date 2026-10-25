@@ -48,8 +48,9 @@ class WPFPV_Honeypot {
 		add_action( 'wpforms_frontend_output', array( $this, 'render_field' ), 16, 1 );
 		// Below the form: a note that only administrators see.
 		add_action( 'wpforms_frontend_output_after', array( $this, 'render_admin_note' ), 10, 1 );
-		// Before the other checks, so a bot is stopped first.
-		add_action( 'wpforms_process', array( $this, 'check' ), 1, 3 );
+		// At the very start of the processing: a rejected submission never reaches the checks
+		// of WPForms that store entries as spam, so nothing is saved.
+		add_action( 'wpforms_process_before', array( $this, 'check' ), 1, 2 );
 	}
 
 	/**
@@ -59,6 +60,13 @@ class WPFPV_Honeypot {
 	 */
 	public static function get_count() {
 		return absint( get_option( self::COUNTER_OPTION, 0 ) );
+	}
+
+	/**
+	 * Count one more stopped bot.
+	 */
+	public static function count_bot() {
+		update_option( self::COUNTER_OPTION, self::get_count() + 1, false );
 	}
 
 	/**
@@ -126,11 +134,16 @@ class WPFPV_Honeypot {
 	/**
 	 * WPForms hook: reject the submission when the honeypot field is filled.
 	 *
-	 * @param array $fields    Sanitized fields.
 	 * @param array $entry     Submitted data.
 	 * @param array $form_data Form data.
 	 */
-	public function check( $fields, $entry, $form_data ) {
+	public function check( $entry, $form_data ) {
+		// AMP verification requests expect field errors only and carry no honeypot.
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		if ( isset( $_POST['__amp_form_verify'] ) ) {
+			return;
+		}
+
 		$form_id  = isset( $form_data['id'] ) ? absint( $form_data['id'] ) : 0;
 		$settings = WPFPV_Settings::get( $form_id );
 		if ( empty( $settings['honeypot_enabled'] ) ) {
@@ -156,7 +169,7 @@ class WPFPV_Honeypot {
 
 		wpforms()->process->errors[ $form_id ]['header'] = __( 'Your submission could not be processed.', 'phone-validator-for-wpforms' );
 
-		update_option( self::COUNTER_OPTION, self::get_count() + 1, false );
+		self::count_bot();
 
 		WPFPV_Logger::log(
 			'HONEYPOT',

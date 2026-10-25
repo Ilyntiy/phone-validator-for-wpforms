@@ -5,7 +5,7 @@ Tags: wpforms, phone, spam, honeypot, form protection
 Requires at least: 5.6
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -22,6 +22,7 @@ Paid traffic brings real leads and a lot of junk: numbers like 1111111, random d
 * **Allowed country codes.** Accept only the countries you serve, for example +1, +44, +33, +34.
 * **Input mask.** Describe the format once, for example `+1 *** *** ****`, and visitors get it while typing. The server checks the number again, so the mask cannot be bypassed by a bot.
 * **Honeypot.** An invisible field that people never fill and simple bots always do. The field name is random for your site and you can change it. A counter shows how many bots were stopped.
+* **Browser check.** A small script adds a hidden field in the visitor's browser. Bots that send the form without a browser, or with a forged value, are stopped before WPForms saves anything. Can be switched off if a caching plugin delays scripts on your site.
 * **Limits per IP.** A minimum interval between submissions and a limit of submissions per IP address in 24 hours. Trusted IP addresses and logged-in administrators can be excluded.
 * **Correct IP behind Cloudflare and proxies.** Without it every visitor would look the same and the limits would block everyone. Cloudflare is built in; other proxies are supported through a list of trusted addresses.
 * **History.** Rejected and accepted submissions with filters, paging, download and automatic cleanup.
@@ -29,7 +30,7 @@ Paid traffic brings real leads and a lot of junk: numbers like 1111111, random d
 **Good to know**
 
 * The mask is applied while typing to plain phone fields. WPForms "Smart" phone fields (with a country selector) format themselves, for them the server check applies.
-* The honeypot and the mask are checked on the server. Nothing depends on JavaScript.
+* The honeypot, the browser check and the mask are re-checked on the server. Rejecting submissions without the browser check needs JavaScript in the visitor's browser; you can turn that option off.
 * A short note under forms is shown only to logged-in administrators (it can be turned off). Visitors never see any label or link of the plugin.
 
 = Privacy =
@@ -87,6 +88,15 @@ The plugin is translation ready. Translations are contributed on translate.wordp
 
 == Changelog ==
 
+= 1.1.1 =
+* Fixed: accepted submissions were not written to the history when limits were off, or for administrators and trusted IP addresses.
+* Fixed: the honeypot is now checked at the very start of processing, so a rejected bot is not saved by WPForms, not even as spam.
+* New: browser check. A small script adds a hidden field in the visitor's browser; submissions sent without a real browser or with a forged value are rejected.
+* New: option to reject submissions without the browser check. It is on for new installations; sites updated from 1.1.0 keep it off until you turn it on.
+* New: a recommended value and a hint under every option in the settings.
+* New: history types "Bot (browser check)" and "No JavaScript".
+* Improved: AMP verification requests are ignored by the bot checks.
+
 = 1.1.0 =
 * New: limit of submissions per IP address in 24 hours (all forms together or per form), trusted IP addresses, administrators excluded.
 * New: input mask such as +1 *** *** **** with a server-side re-check.
@@ -106,6 +116,9 @@ The plugin is translation ready. Translations are contributed on translate.wordp
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.1.1 =
+Fixes the history of accepted submissions and stops bots before WPForms saves them. New browser check option, off after an update until you turn it on.
 
 = 1.1.0 =
 New honeypot, per-IP limit, input mask and number normalization for all countries. Your settings are kept. If your site is behind Cloudflare or a proxy, select it in Settings → Visitor IP address.

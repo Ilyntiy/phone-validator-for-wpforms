@@ -59,6 +59,7 @@ class WPFPV_Core {
 		WPFPV_Validator::instance();
 		WPFPV_Throttle::instance();
 		WPFPV_Honeypot::instance();
+		WPFPV_Guard::instance();
 		WPFPV_Frontend::instance();
 	}
 
@@ -139,6 +140,9 @@ class WPFPV_Core {
 
 			// A fresh install guesses the default country from the site language.
 			$defaults['default_country'] = WPFPV_Phone::country_from_locale( get_locale() );
+
+			// The browser check is on for new sites. Sites updated from 1.1.0 keep it off until the owner turns it on.
+			$defaults['guard_required'] = 1;
 			add_option( WPFPV_Settings::OPTION, $defaults, '', false );
 		}
 

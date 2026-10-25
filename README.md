@@ -72,6 +72,14 @@ The country calling code and number length table is generated from the open [lib
 
 ## Changelog
 
+### 1.1.1
+- Fixed: accepted submissions were missing from the history when limits were off or for exempt visitors.
+- Fixed: honeypot is checked at the start of processing, so rejected bots are not saved by WPForms (not even as spam).
+- New: browser check (hidden field added by a script) with an option to reject submissions without it: on for new installs, off after an update from 1.1.0.
+- New: recommended value and hint under every settings option.
+- New: history types "Bot (browser check)" and "No JavaScript".
+- Improved: AMP verification requests are ignored by the bot checks.
+
 ### 1.1.0
 - New: per-IP limit in 24 hours, trusted IPs.
 - New: input mask with server-side re-check.

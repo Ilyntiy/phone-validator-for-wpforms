@@ -44,6 +44,8 @@ $wpfpv_labels = array(
 	'THROTTLE'   => __( 'Too frequent', 'phone-validator-for-wpforms' ),
 	'LIMIT'      => __( 'Daily limit', 'phone-validator-for-wpforms' ),
 	'HONEYPOT'   => __( 'Bot (honeypot)', 'phone-validator-for-wpforms' ),
+	'BOTCHECK'   => __( 'Bot (browser check)', 'phone-validator-for-wpforms' ),
+	'NOJS'       => __( 'No JavaScript', 'phone-validator-for-wpforms' ),
 	'SUCCESS'    => __( 'Accepted', 'phone-validator-for-wpforms' ),
 	'OTHER'      => __( 'Other', 'phone-validator-for-wpforms' ),
 );

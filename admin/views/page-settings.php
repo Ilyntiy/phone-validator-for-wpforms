@@ -57,6 +57,7 @@ $wpfpv_name = static function ( $key ) use ( $wpfpv_option ) {
 						&ndash;
 						<input type="number" id="wpfpv-max" class="small-text" min="3" max="20" aria-label="<?php esc_attr_e( 'Maximum digits', 'phone-validator-for-wpforms' ); ?>" name="<?php echo $wpfpv_name( 'max_length' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in the closure. ?>" value="<?php echo esc_attr( $wpfpv_s['max_length'] ); ?>">
 						<p class="description"><?php esc_html_e( 'Counted on the full international number, including the country code.', 'phone-validator-for-wpforms' ); ?></p>
+						<p class="description wpfpv-rec"><strong><?php esc_html_e( 'Recommended:', 'phone-validator-for-wpforms' ); ?></strong> <?php esc_html_e( '6 and 15. 15 is the international maximum. If you serve a single country, you may narrow the range to its real number lengths.', 'phone-validator-for-wpforms' ); ?></p>
 					</td>
 				</tr>
 				<tr>
@@ -64,6 +65,7 @@ $wpfpv_name = static function ( $key ) use ( $wpfpv_option ) {
 					<td>
 						<input type="number" id="wpfpv-repeats" class="small-text" min="0" max="20" name="<?php echo $wpfpv_name( 'max_repeats' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in the closure. ?>" value="<?php echo esc_attr( $wpfpv_s['max_repeats'] ); ?>">
 						<p class="description"><?php esc_html_e( 'The most identical digits that may stand in a row. A longer run is rejected: with 5, the number 000000 (six zeros) is rejected and 00000 is accepted. 0 turns the check off.', 'phone-validator-for-wpforms' ); ?></p>
+						<p class="description wpfpv-rec"><strong><?php esc_html_e( 'Recommended:', 'phone-validator-for-wpforms' ); ?></strong> <?php esc_html_e( '5. Values below 4 can reject real numbers.', 'phone-validator-for-wpforms' ); ?></p>
 					</td>
 				</tr>
 				<tr>
@@ -71,6 +73,7 @@ $wpfpv_name = static function ( $key ) use ( $wpfpv_option ) {
 					<td>
 						<input type="number" id="wpfpv-sequence" class="small-text" min="0" max="20" name="<?php echo $wpfpv_name( 'sequence_length' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in the closure. ?>" value="<?php echo esc_attr( $wpfpv_s['sequence_length'] ); ?>">
 						<p class="description"><?php esc_html_e( 'Reject ascending or descending runs such as 1234567 or 7654321 of at least this length. 0 turns the check off.', 'phone-validator-for-wpforms' ); ?></p>
+						<p class="description wpfpv-rec"><strong><?php esc_html_e( 'Recommended:', 'phone-validator-for-wpforms' ); ?></strong> <?php esc_html_e( '7. Shorter values (5 or 6) can reject real numbers that contain a run such as 123456.', 'phone-validator-for-wpforms' ); ?></p>
 					</td>
 				</tr>
 				<tr>
@@ -78,6 +81,7 @@ $wpfpv_name = static function ( $key ) use ( $wpfpv_option ) {
 					<td>
 						<textarea id="wpfpv-blacklist" class="large-text code" rows="6" name="<?php echo $wpfpv_name( 'blacklist' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in the closure. ?>"><?php echo esc_textarea( $wpfpv_s['blacklist'] ); ?></textarea>
 						<p class="description"><?php esc_html_e( 'One number per line. Numbers are normalized before the comparison, so 07700 900123 and +44 7700 900123 are the same entry.', 'phone-validator-for-wpforms' ); ?></p>
+						<p class="description wpfpv-rec"><strong><?php esc_html_e( 'Recommended:', 'phone-validator-for-wpforms' ); ?></strong> <?php esc_html_e( 'Add numbers that keep arriving as junk. Otherwise leave it as it is.', 'phone-validator-for-wpforms' ); ?></p>
 					</td>
 				</tr>
 			</table>
@@ -107,6 +111,7 @@ $wpfpv_name = static function ( $key ) use ( $wpfpv_option ) {
 							<?php endforeach; ?>
 						</select>
 						<p class="description"><?php esc_html_e( 'Numbers typed without a country code are treated as numbers of this country (a leading 8 or 0 is understood). The stored number is never changed; this is used for the checks only.', 'phone-validator-for-wpforms' ); ?></p>
+						<p class="description wpfpv-rec"><strong><?php esc_html_e( 'Recommended:', 'phone-validator-for-wpforms' ); ?></strong> <?php esc_html_e( 'The country where most of your visitors live.', 'phone-validator-for-wpforms' ); ?></p>
 					</td>
 				</tr>
 				<tr>
@@ -114,6 +119,7 @@ $wpfpv_name = static function ( $key ) use ( $wpfpv_option ) {
 					<td>
 						<textarea id="wpfpv-rules" class="large-text code" rows="3" placeholder="07 =&gt; +447" name="<?php echo $wpfpv_name( 'custom_rules' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in the closure. ?>"><?php echo esc_textarea( $wpfpv_s['custom_rules'] ); ?></textarea>
 						<p class="description"><?php esc_html_e( 'Optional, one rule per line: "from => to". A number that starts with the left part is checked as if it started with the right part. Rules go before the default country.', 'phone-validator-for-wpforms' ); ?></p>
+						<p class="description wpfpv-rec"><strong><?php esc_html_e( 'Recommended:', 'phone-validator-for-wpforms' ); ?></strong> <?php esc_html_e( 'Leave empty. Add a rule only if numbers of your visitors are not understood, for example when they type a local prefix.', 'phone-validator-for-wpforms' ); ?></p>
 					</td>
 				</tr>
 				<tr>
@@ -121,6 +127,7 @@ $wpfpv_name = static function ( $key ) use ( $wpfpv_option ) {
 					<td>
 						<input type="text" id="wpfpv-codes" class="regular-text" placeholder="+1, +44, +33, +34" name="<?php echo $wpfpv_name( 'allowed_country_codes' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in the closure. ?>" value="<?php echo esc_attr( $wpfpv_s['allowed_country_codes'] ); ?>">
 						<p class="description"><?php esc_html_e( 'Only numbers that start with one of these codes are accepted. Leave empty to accept any country.', 'phone-validator-for-wpforms' ); ?></p>
+						<p class="description wpfpv-rec"><strong><?php esc_html_e( 'Recommended:', 'phone-validator-for-wpforms' ); ?></strong> <?php esc_html_e( 'Leave empty to accept any country. Fill it in only with the countries you really serve, for example +1, +44.', 'phone-validator-for-wpforms' ); ?></p>
 					</td>
 				</tr>
 			</table>
@@ -146,6 +153,7 @@ $wpfpv_name = static function ( $key ) use ( $wpfpv_option ) {
 					<td>
 						<textarea id="wpfpv-masks" class="large-text code" rows="3" placeholder="+1 *** *** ****" name="<?php echo $wpfpv_name( 'masks' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in the closure. ?>"><?php echo esc_textarea( $wpfpv_s['masks'] ); ?></textarea>
 						<p class="description"><?php esc_html_e( 'One mask per line. * is any digit, digits are fixed, other characters are separators. With several masks the one that fits the typed code is used.', 'phone-validator-for-wpforms' ); ?></p>
+						<p class="description wpfpv-rec"><strong><?php esc_html_e( 'Recommended:', 'phone-validator-for-wpforms' ); ?></strong> <?php esc_html_e( 'Turn the mask on only if you want one fixed format. Use one mask per country, for example +1 *** *** ****.', 'phone-validator-for-wpforms' ); ?></p>
 						<p class="description"><?php esc_html_e( 'Visitors get the format while typing, and the number is checked again on the server, so the mask cannot be bypassed. Fields with a country selector (Smart phone) format themselves: only the server check applies to them.', 'phone-validator-for-wpforms' ); ?></p>
 					</td>
 				</tr>
@@ -174,6 +182,19 @@ $wpfpv_name = static function ( $key ) use ( $wpfpv_option ) {
 						<input type="text" id="wpfpv-hp-name" class="regular-text code" autocomplete="off" spellcheck="false" name="<?php echo $wpfpv_name( 'honeypot_field_name' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in the closure. ?>" value="<?php echo esc_attr( WPFPV_Settings::honeypot_name() ); ?>">
 						<button type="button" class="button" id="wpfpv-hp-generate"><?php esc_html_e( 'Generate', 'phone-validator-for-wpforms' ); ?></button>
 						<p class="description"><?php esc_html_e( 'A random name is created for your site. Letters, digits and underscore, 6 to 32 characters, starting with a letter. Change it if bots learn it.', 'phone-validator-for-wpforms' ); ?></p>
+						<p class="description wpfpv-rec"><strong><?php esc_html_e( 'Recommended:', 'phone-validator-for-wpforms' ); ?></strong> <?php esc_html_e( 'Keep the generated name. After you change it, clear the page cache: cached pages still contain the old name.', 'phone-validator-for-wpforms' ); ?></p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row"><?php esc_html_e( 'Browser check', 'phone-validator-for-wpforms' ); ?></th>
+					<td>
+						<label class="wpfpv-switch">
+							<input type="checkbox" role="switch" name="<?php echo $wpfpv_name( 'guard_required' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in the closure. ?>" value="1" <?php checked( ! empty( $wpfpv_s['guard_required'] ) ); ?>>
+							<span class="wpfpv-switch__track" aria-hidden="true"></span>
+							<span class="wpfpv-switch__text"><?php esc_html_e( 'Reject submissions sent without the browser check', 'phone-validator-for-wpforms' ); ?></span>
+						</label>
+						<p class="description"><?php esc_html_e( 'A small script adds a hidden check field in the visitor\'s browser. Bots that send the form directly, without running scripts, do not have it and are rejected before WPForms saves anything. Visitors who browse with JavaScript turned off see a message asking them to turn it on. A forged check value is always rejected, whatever this option says.', 'phone-validator-for-wpforms' ); ?></p>
+						<p class="description wpfpv-rec"><strong><?php esc_html_e( 'Recommended:', 'phone-validator-for-wpforms' ); ?></strong> <?php esc_html_e( 'On. If real visitors see the message about JavaScript, a caching or optimization plugin is most likely delaying scripts: exclude the script of this plugin (guard.js) from delaying and clear the cache. If that is not possible, turn the option off; the honeypot and the other checks keep working.', 'phone-validator-for-wpforms' ); ?></p>
 					</td>
 				</tr>
 				<tr>
@@ -185,6 +206,7 @@ $wpfpv_name = static function ( $key ) use ( $wpfpv_option ) {
 							<span class="wpfpv-switch__text"><?php esc_html_e( 'Show a note under forms while I am logged in as an administrator', 'phone-validator-for-wpforms' ); ?></span>
 						</label>
 						<p class="description"><?php esc_html_e( 'Visitors never see this note.', 'phone-validator-for-wpforms' ); ?></p>
+						<p class="description wpfpv-rec"><strong><?php esc_html_e( 'Recommended:', 'phone-validator-for-wpforms' ); ?></strong> <?php esc_html_e( 'Keep it on while you set the plugin up, then turn it off if you do not want the note under your forms.', 'phone-validator-for-wpforms' ); ?></p>
 					</td>
 				</tr>
 				<tr>
@@ -217,6 +239,7 @@ $wpfpv_name = static function ( $key ) use ( $wpfpv_option ) {
 					<td>
 						<input type="number" id="wpfpv-throttle" class="small-text" min="0" max="1440" name="<?php echo $wpfpv_name( 'throttle_time' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in the closure. ?>" value="<?php echo esc_attr( $wpfpv_s['throttle_time'] ); ?>">
 						<p class="description"><?php esc_html_e( 'How long one visitor must wait between two submissions of the same form. 0 turns it off.', 'phone-validator-for-wpforms' ); ?></p>
+						<p class="description wpfpv-rec"><strong><?php esc_html_e( 'Recommended:', 'phone-validator-for-wpforms' ); ?></strong> <?php esc_html_e( '3 minutes stops repeated sends. Set 0 if one person may legitimately send several requests in a row.', 'phone-validator-for-wpforms' ); ?></p>
 					</td>
 				</tr>
 				<tr>
@@ -224,6 +247,7 @@ $wpfpv_name = static function ( $key ) use ( $wpfpv_option ) {
 					<td>
 						<input type="number" id="wpfpv-daily" class="small-text" min="0" max="1000" name="<?php echo $wpfpv_name( 'daily_limit' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in the closure. ?>" value="<?php echo esc_attr( $wpfpv_s['daily_limit'] ); ?>">
 						<p class="description"><?php esc_html_e( 'Maximum accepted submissions from one IP address within the last 24 hours. 0 turns it off. Offices and mobile networks share addresses, so keep the number generous.', 'phone-validator-for-wpforms' ); ?></p>
+						<p class="description wpfpv-rec"><strong><?php esc_html_e( 'Recommended:', 'phone-validator-for-wpforms' ); ?></strong> <?php esc_html_e( '0 (off). If you see floods from one address, try 10 to 20.', 'phone-validator-for-wpforms' ); ?></p>
 					</td>
 				</tr>
 				<tr>
@@ -233,6 +257,7 @@ $wpfpv_name = static function ( $key ) use ( $wpfpv_option ) {
 							<option value="site" <?php selected( $wpfpv_s['limit_scope'], 'site' ); ?>><?php esc_html_e( 'All forms together', 'phone-validator-for-wpforms' ); ?></option>
 							<option value="form" <?php selected( $wpfpv_s['limit_scope'], 'form' ); ?>><?php esc_html_e( 'Each form separately', 'phone-validator-for-wpforms' ); ?></option>
 						</select>
+						<p class="description wpfpv-rec"><strong><?php esc_html_e( 'Recommended:', 'phone-validator-for-wpforms' ); ?></strong> <?php esc_html_e( 'All forms together, unless one visitor legitimately uses several different forms.', 'phone-validator-for-wpforms' ); ?></p>
 					</td>
 				</tr>
 				<tr>
@@ -240,6 +265,7 @@ $wpfpv_name = static function ( $key ) use ( $wpfpv_option ) {
 					<td>
 						<textarea id="wpfpv-whitelist" class="large-text code" rows="3" placeholder="203.0.113.7&#10;198.51.100.0/24" name="<?php echo $wpfpv_name( 'whitelist_ips' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in the closure. ?>"><?php echo esc_textarea( $wpfpv_s['whitelist_ips'] ); ?></textarea>
 						<p class="description"><?php esc_html_e( 'One IP address or range (CIDR) per line. The limits do not apply to them, for example your office.', 'phone-validator-for-wpforms' ); ?></p>
+						<p class="description wpfpv-rec"><strong><?php esc_html_e( 'Recommended:', 'phone-validator-for-wpforms' ); ?></strong> <?php esc_html_e( 'Add your own address and your office, so your tests are not limited.', 'phone-validator-for-wpforms' ); ?></p>
 					</td>
 				</tr>
 				<tr>
@@ -279,6 +305,7 @@ $wpfpv_name = static function ( $key ) use ( $wpfpv_option ) {
 							);
 							?>
 						</p>
+						<p class="description wpfpv-rec"><strong><?php esc_html_e( 'Recommended:', 'phone-validator-for-wpforms' ); ?></strong> <?php esc_html_e( 'Cloudflare if you use it, otherwise leave the default. The address shown above must be yours, not your server\'s.', 'phone-validator-for-wpforms' ); ?></p>
 					</td>
 				</tr>
 				<tr class="wpfpv-custom-proxy">
@@ -296,6 +323,7 @@ $wpfpv_name = static function ( $key ) use ( $wpfpv_option ) {
 					<td>
 						<textarea id="wpfpv-trusted" class="large-text code" rows="3" name="<?php echo $wpfpv_name( 'trusted_proxies' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in the closure. ?>"><?php echo esc_textarea( $wpfpv_s['trusted_proxies'] ); ?></textarea>
 						<p class="description"><?php esc_html_e( 'One IP address or range per line. The header is trusted only when the request comes from one of them; anyone else could forge it.', 'phone-validator-for-wpforms' ); ?></p>
+						<p class="description wpfpv-rec"><strong><?php esc_html_e( 'Recommended:', 'phone-validator-for-wpforms' ); ?></strong> <?php esc_html_e( 'Only the addresses of your own proxy. Never add visitor addresses.', 'phone-validator-for-wpforms' ); ?></p>
 					</td>
 				</tr>
 			</table>
@@ -321,6 +349,7 @@ $wpfpv_name = static function ( $key ) use ( $wpfpv_option ) {
 					<td>
 						<input type="number" id="wpfpv-clean" class="small-text" min="0" max="3650" name="<?php echo $wpfpv_name( 'auto_clean_logs' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped in the closure. ?>" value="<?php echo esc_attr( $wpfpv_s['auto_clean_logs'] ); ?>">
 						<p class="description"><?php esc_html_e( '0 keeps entries until the file reaches its size limit.', 'phone-validator-for-wpforms' ); ?></p>
+						<p class="description wpfpv-rec"><strong><?php esc_html_e( 'Recommended:', 'phone-validator-for-wpforms' ); ?></strong> <?php esc_html_e( '30 days. The history holds personal data: keep it as short as you need.', 'phone-validator-for-wpforms' ); ?></p>
 					</td>
 				</tr>
 			</table>

@@ -117,15 +117,32 @@ class WPFPV_Throttle {
 	}
 
 	/**
-	 * WPForms hook: remember a successful submission.
+	 * WPForms hook: record a successful submission in the history and count it for the limits.
 	 *
 	 * @param array $fields    Sanitized fields.
 	 * @param array $entry     Submitted data.
 	 * @param array $form_data Form data.
 	 */
 	public function record( $fields, $entry, $form_data ) {
-		$form_id  = isset( $form_data['id'] ) ? absint( $form_data['id'] ) : 0;
+		$form_id = isset( $form_data['id'] ) ? absint( $form_data['id'] ) : 0;
+
+		if ( ! empty( wpforms()->process->errors[ $form_id ] ) ) {
+			return;
+		}
+
 		$settings = WPFPV_Settings::get( $form_id );
+		$ip       = WPFPV_IP::get( $settings );
+
+		// The history does not depend on the limits: an accepted submission is always recorded.
+		WPFPV_Logger::log(
+			'SUCCESS',
+			array(
+				'ip'      => $ip,
+				'form'    => $form_id,
+				'message' => __( 'Submission accepted', 'phone-validator-for-wpforms' ),
+			)
+		);
+
 		$interval = absint( $settings['throttle_time'] );
 		$limit    = absint( $settings['daily_limit'] );
 
@@ -133,11 +150,6 @@ class WPFPV_Throttle {
 			return;
 		}
 
-		if ( ! empty( wpforms()->process->errors[ $form_id ] ) ) {
-			return;
-		}
-
-		$ip = WPFPV_IP::get( $settings );
 		if ( '' === $ip || self::is_exempt( $ip, $settings ) ) {
 			return;
 		}
@@ -152,15 +164,6 @@ class WPFPV_Throttle {
 			$stamps[] = time();
 			set_transient( $key, $stamps, DAY_IN_SECONDS );
 		}
-
-		WPFPV_Logger::log(
-			'SUCCESS',
-			array(
-				'ip'      => $ip,
-				'form'    => $form_id,
-				'message' => __( 'Submission accepted', 'phone-validator-for-wpforms' ),
-			)
-		);
 	}
 
 	/**

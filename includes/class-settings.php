@@ -91,6 +91,7 @@ class WPFPV_Settings {
 			'honeypot_enabled'      => 1,
 			'honeypot_field_name'   => '',
 			'honeypot_indicator'    => 1,
+			'guard_required'        => 0,
 
 			// Rate limiting.
 			'limits_enabled'        => 1,
@@ -154,6 +155,16 @@ class WPFPV_Settings {
 		}
 
 		return $name;
+	}
+
+	/**
+	 * Name of the browser-check field: a stable per-site name that is not editable,
+	 * so a cached page never carries a name the server no longer knows.
+	 *
+	 * @return string
+	 */
+	public static function guard_name() {
+		return 'g' . substr( wp_hash( 'wpfpv-guard' ), 0, 11 );
 	}
 
 	/**
@@ -259,6 +270,7 @@ class WPFPV_Settings {
 			$name = $previous['honeypot_field_name'];
 		}
 		$out['honeypot_field_name'] = $name;
+		$out['guard_required']      = empty( $input['guard_required'] ) ? 0 : 1;
 
 		// Rate limiting.
 		$out['limits_enabled'] = empty( $input['limits_enabled'] ) ? 0 : 1;
